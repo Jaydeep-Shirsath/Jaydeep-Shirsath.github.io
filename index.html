@@ -3,880 +3,1590 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jaydeep Shirsath | Cyber Security Terminal OS</title>
+    <title>Jaydeep Shirsath | ParrotSec OS v5.4 Interactive Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Linux system icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --term-bg: #030a05;
-            --term-fg: #00ff66;
-            --term-glow: rgba(0, 255, 102, 0.35);
-            --term-dim: #008f39;
-            --term-accent: #00e5ff;
-            --term-warn: #ffb703;
-            --term-err: #ff3344;
-            --term-white: #e2e8f0;
-            --term-border: rgba(0, 255, 102, 0.2);
-            --crt-scanline: rgba(0, 0, 0, 0.28);
-        }
-
-        body[data-theme="amber"] {
-            --term-bg: #0c0800;
-            --term-fg: #ffb000;
-            --term-glow: rgba(255, 176, 0, 0.35);
-            --term-dim: #b37400;
-            --term-accent: #ffd166;
-            --term-warn: #ff8800;
-            --term-err: #ff3b30;
-            --term-white: #fef08a;
-            --term-border: rgba(255, 176, 0, 0.25);
-        }
-
-        body[data-theme="cyber"] {
-            --term-bg: #020b14;
-            --term-fg: #00f0ff;
-            --term-glow: rgba(0, 240, 255, 0.4);
-            --term-dim: #0284c7;
-            --term-accent: #e040fb;
-            --term-warn: #f59e0b;
-            --term-err: #ff2a6d;
-            --term-white: #f8fafc;
-            --term-border: rgba(0, 240, 255, 0.25);
-        }
-
-        body[data-theme="blood"] {
-            --term-bg: #0c0204;
-            --term-fg: #ff2a4b;
-            --term-glow: rgba(255, 42, 75, 0.4);
-            --term-dim: #991b1b;
-            --term-accent: #fb7185;
-            --term-warn: #fb923c;
-            --term-err: #f43f5e;
-            --term-white: #ffe4e6;
-            --term-border: rgba(255, 42, 75, 0.25);
+            --bg-dark: #0a0e14;
+            --panel-bg: rgba(13, 19, 29, 0.88);
+            --window-bg: rgba(15, 23, 36, 0.94);
+            --window-header: #131d2e;
+            --accent-cyan: #00d2ff;
+            --accent-green: #00ff9d;
+            --accent-purple: #9d4edd;
+            --accent-red: #ff3860;
+            --accent-amber: #ffb703;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border-color: rgba(0, 210, 255, 0.22);
+            --border-glow: rgba(0, 255, 157, 0.15);
+            --glass-blur: blur(12px);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Fira Code', 'Courier New', Courier, monospace;
-            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
-        html, body {
+        body, html {
+            width: 100%;
             height: 100%;
-            background-color: var(--term-bg);
-            color: var(--term-fg);
             overflow: hidden;
-            font-size: 13.5px;
-            text-shadow: 0 0 4px var(--term-glow);
-            transition: background 0.3s, color 0.3s;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
         }
 
-        /* CRT Screen Scanlines & Vignette Overlay */
-        .crt-overlay {
-            position: fixed;
-            top: 0;
+        /* Desktop Wallpaper & Background Grid */
+        #desktop {
+            position: absolute;
+            top: 36px;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 9999;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, var(--crt-scanline) 50%),
-                        radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.65) 100%);
-            background-size: 100% 3px, 100% 100%;
-        }
-
-        .crt-flicker {
-            animation: flicker 0.15s infinite;
-            opacity: 0.015;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: white;
-            pointer-events: none;
-            z-index: 9998;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.012; }
-            50% { opacity: 0.024; }
-            100% { opacity: 0.015; }
-        }
-
-        /* Shell Container */
-        .terminal-window {
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            background: radial-gradient(circle at 75% 20%, rgba(0, 210, 255, 0.08) 0%, transparent 45%),
+                        radial-gradient(circle at 20% 80%, rgba(0, 255, 157, 0.06) 0%, transparent 50%),
+                        linear-gradient(135deg, #06090e 0%, #0c121d 60%, #070b12 100%);
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            padding: 8px 12px 14px 12px;
-            box-sizing: border-box;
         }
 
-        /* Top Bar */
-        .terminal-bar {
+        /* Subtle Matrix/Hex Grid overlay */
+        #desktop::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 210, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 210, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* Watermark / Logo on Wallpaper */
+        .desktop-watermark {
+            position: absolute;
+            right: 36px;
+            bottom: 40px;
+            text-align: right;
+            pointer-events: none;
+            opacity: 0.18;
+            font-family: 'Fira Code', monospace;
+        }
+        .desktop-watermark h1 {
+            font-size: 44px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            letter-spacing: 2px;
+        }
+        .desktop-watermark p {
+            font-size: 14px;
+            color: var(--accent-green);
+        }
+
+        /* Top Taskbar / Panel */
+        #top-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 36px;
+            background: var(--panel-bg);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 6px 12px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--term-border);
-            border-radius: 6px;
-            margin-bottom: 8px;
-            font-size: 11px;
-            color: var(--term-accent);
-            user-select: none;
+            justify-content: space-between;
+            padding: 0 10px;
+            z-index: 10000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
         }
 
-        .terminal-bar-left {
+        .panel-left, .panel-right {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            gap: 4px;
+        }
+
+        .panel-tasks {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            overflow-x: auto;
+            gap: 6px;
+            height: 100%;
+        }
+        .panel-tasks::-webkit-scrollbar { display: none; }
+
+        .app-menu-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 210, 255, 0.12);
+            border: 1px solid rgba(0, 210, 255, 0.35);
+            padding: 4px 12px;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Fira Code', monospace;
+        }
+        .app-menu-btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 0 0 12px var(--accent-cyan);
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-main);
+            cursor: pointer;
+            height: 26px;
+            max-width: 170px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .task-item.active {
+            background: rgba(0, 255, 157, 0.15);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            box-shadow: 0 0 8px rgba(0, 255, 157, 0.2);
+        }
+
+        .sys-tray-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .sys-tray-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+        }
+        .sys-time {
+            font-family: 'Fira Code', monospace;
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        /* Desktop App Grid */
+        .desktop-icons-container {
+            display: grid;
+            grid-auto-flow: column;
+            grid-template-rows: repeat(auto-fill, 94px);
+            gap: 12px;
+            padding: 18px;
+            width: fit-content;
+            z-index: 10;
+        }
+
+        .desktop-icon {
+            width: 86px;
+            height: 88px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 4px;
+            text-align: center;
+            transition: all 0.18s;
+            border: 1px solid transparent;
+        }
+        .desktop-icon:hover {
+            background: rgba(0, 210, 255, 0.12);
+            border: 1px solid rgba(0, 210, 255, 0.35);
+            box-shadow: 0 0 12px rgba(0, 210, 255, 0.15);
+        }
+        .desktop-icon:active {
+            transform: scale(0.96);
+        }
+        .desktop-icon i {
+            font-size: 32px;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+        .desktop-icon .icon-name {
+            font-size: 11px;
+            font-weight: 500;
+            line-height: 1.2;
+            word-break: break-word;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* App Icon Colors */
+        .color-term { color: #00ff9d; }
+        .color-folder { color: #ffd166; }
+        .color-pdf { color: #ff4757; }
+        .color-browser { color: #00d2ff; }
+        .color-gh { color: #f0f6fc; }
+        .color-yt { color: #ff0033; }
+        .color-li { color: #0a66c2; }
+        .color-thm { color: #ff3333; }
+        .color-tool { color: #9d4edd; }
+
+        /* Window Manager Styles */
+        .os-window {
+            position: absolute;
+            background: var(--window-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65), 0 0 1px rgba(0, 210, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 340px;
+            min-height: 220px;
+            z-index: 100;
+            animation: winOpen 0.15s ease-out;
+        }
+
+        @keyframes winOpen {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .os-window.maximized {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 0;
+        }
+
+        .os-window.minimized {
+            display: none !important;
+        }
+
+        .win-titlebar {
+            height: 36px;
+            background: var(--window-header);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            cursor: move;
+        }
+
+        .win-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .win-controls {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .terminal-dots {
-            display: flex;
-            gap: 5px;
-        }
-        .dot {
-            width: 9px;
-            height: 9px;
+        .win-btn {
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            display: inline-block;
-        }
-        .dot-red { background: #ff5f56; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #27c93f; }
-
-        .terminal-bar-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .top-btn {
-            background: transparent;
-            border: 1px solid var(--term-border);
-            color: var(--term-fg);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
             cursor: pointer;
-            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: transparent;
+            transition: all 0.15s;
         }
-        .top-btn:hover {
-            background: var(--term-fg);
-            color: var(--term-bg);
-            box-shadow: 0 0 8px var(--term-fg);
+        .win-btn:hover {
+            color: rgba(0,0,0,0.7);
         }
+        .win-btn-close { background: #ff5f56; }
+        .win-btn-max { background: #27c93f; }
+        .win-btn-min { background: #ffbd2e; }
 
-        /* Output Viewport */
-        .terminal-viewport {
+        .win-body {
             flex: 1;
-            overflow-y: auto;
-            padding-right: 6px;
-            scroll-behavior: smooth;
+            overflow: auto;
+            position: relative;
+            background: rgba(10, 15, 24, 0.85);
+            font-size: 13px;
         }
 
-        .terminal-viewport::-webkit-scrollbar {
-            width: 6px;
+        /* Application Menu (Start Menu) */
+        #app-menu {
+            position: absolute;
+            top: 40px;
+            left: 8px;
+            width: 440px;
+            background: rgba(13, 19, 29, 0.95);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.7);
+            z-index: 20000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .terminal-viewport::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.4);
-        }
-        .terminal-viewport::-webkit-scrollbar-thumb {
-            background: var(--term-dim);
-            border-radius: 3px;
-        }
+        #app-menu.show { display: flex; }
 
-        /* Text and Output Styles */
-        .line {
-            margin-bottom: 4px;
-            line-height: 1.5;
-            word-break: break-word;
+        .menu-header {
+            padding: 14px 16px;
+            background: linear-gradient(90deg, rgba(0, 210, 255, 0.15), rgba(0, 255, 157, 0.08));
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-
-        .ascii-logo {
-            font-size: 10.5px;
-            line-height: 1.15;
-            color: var(--term-fg);
+        .menu-user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #0284c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 700;
-            white-space: pre;
-            margin: 10px 0;
-            overflow-x: auto;
+            font-size: 18px;
+            border: 2px solid var(--accent-cyan);
         }
-
-        @media (max-width: 768px) {
-            .ascii-logo {
-                font-size: 6px;
-                letter-spacing: -0.5px;
-            }
-            body {
-                font-size: 12px;
-            }
+        .menu-user-info h3 {
+            font-size: 14px;
+            color: #fff;
         }
-
-        .txt-dim { color: var(--term-dim); }
-        .txt-accent { color: var(--term-accent); }
-        .txt-warn { color: var(--term-warn); }
-        .txt-err { color: var(--term-err); font-weight: 600; }
-        .txt-bold { font-weight: 700; color: var(--term-white); }
-        .txt-success { color: var(--term-fg); font-weight: 600; }
-
-        .badge-tag {
-            display: inline-block;
-            background: rgba(0, 255, 102, 0.12);
-            border: 1px solid var(--term-border);
-            padding: 1px 6px;
-            border-radius: 4px;
-            margin: 2px 3px 2px 0;
-            color: var(--term-white);
-            font-size: 11.5px;
-        }
-
-        .card-box {
-            border: 1px dashed var(--term-border);
-            padding: 10px 14px;
-            margin: 8px 0;
-            border-radius: 6px;
-            background: rgba(0, 0, 0, 0.35);
-        }
-
-        .hyperlink {
-            color: var(--term-accent);
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            cursor: pointer;
-        }
-        .hyperlink:hover {
-            color: var(--term-white);
-            background: var(--term-dim);
-            text-decoration: none;
-            padding: 0 2px;
-        }
-
-        /* Quick Action Command Chips */
-        .chip-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin: 10px 0 14px 0;
-            padding: 8px;
-            border: 1px solid var(--term-border);
-            border-radius: 6px;
-            background: rgba(0, 0, 0, 0.25);
-        }
-
-        .chip-label {
-            width: 100%;
+        .menu-user-info p {
             font-size: 11px;
-            color: var(--term-accent);
-            margin-bottom: 2px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--accent-green);
+            font-family: 'Fira Code', monospace;
         }
 
-        .chip-btn {
-            background: rgba(0, 255, 102, 0.08);
-            border: 1px solid var(--term-border);
-            color: var(--term-fg);
-            padding: 4px 10px;
+        .menu-body {
+            display: flex;
+            height: 340px;
+        }
+        .menu-categories {
+            width: 160px;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 8px;
+            background: rgba(0,0,0,0.25);
+        }
+        .cat-item {
+            padding: 8px 10px;
             border-radius: 4px;
-            font-size: 11.5px;
+            font-size: 12px;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.18s ease;
-        }
-        .chip-btn:hover, .chip-btn:active {
-            background: var(--term-fg);
-            color: var(--term-bg);
-            box-shadow: 0 0 10px var(--term-glow);
-            transform: translateY(-1px);
-        }
-
-        /* CLI Input Row */
-        .cli-row {
             display: flex;
             align-items: center;
-            margin-top: 8px;
-            padding: 4px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 8px;
+            color: var(--text-muted);
+            transition: all 0.15s;
+        }
+        .cat-item:hover, .cat-item.active {
+            background: rgba(0, 210, 255, 0.15);
+            color: var(--accent-cyan);
         }
 
-        .cli-prompt {
-            color: var(--term-accent);
+        .menu-items-list {
+            flex: 1;
+            padding: 8px;
+            overflow-y: auto;
+        }
+        .menu-app-item {
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12.5px;
+            transition: all 0.15s;
+        }
+        .menu-app-item:hover {
+            background: rgba(0, 255, 157, 0.15);
+            color: var(--accent-green);
+        }
+
+        /* CONTEXT MENU */
+        #context-menu {
+            position: absolute;
+            background: rgba(15, 23, 36, 0.95);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            padding: 6px 0;
+            min-width: 180px;
+            z-index: 30000;
+            display: none;
+        }
+        .context-item {
+            padding: 7px 14px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+        .context-item:hover {
+            background: rgba(0, 210, 255, 0.2);
+            color: var(--accent-cyan);
+        }
+        .context-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin: 4px 0;
+        }
+
+        /* ---------------- APP CONTENTS ---------------- */
+
+        /* 1. TERMINAL APP */
+        .terminal-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #050a0e;
+            color: var(--accent-green);
+            font-family: 'Fira Code', monospace;
+            padding: 12px;
+            overflow-y: auto;
+            text-shadow: 0 0 4px rgba(0,255,157,0.3);
+        }
+        .terminal-output {
+            line-height: 1.5;
+            font-size: 13px;
+        }
+        .term-prompt-row {
+            display: flex;
+            align-items: center;
+            margin-top: 6px;
+        }
+        .term-prompt {
+            color: var(--accent-cyan);
             font-weight: 600;
             white-space: nowrap;
             margin-right: 8px;
-            user-select: none;
         }
-
-        .cli-input-wrapper {
-            flex: 1;
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .cli-input {
-            width: 100%;
+        .term-input {
             background: transparent;
             border: none;
             outline: none;
-            color: var(--term-white);
-            font-size: 14px;
-            caret-color: var(--term-fg);
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            flex: 1;
+            caret-color: var(--accent-green);
         }
 
-        /* Boot Screen Layer */
-        #boot-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: var(--term-bg);
-            z-index: 999;
-            padding: 20px;
-            overflow-y: auto;
+        /* 2. FILE EXPLORER APP */
+        .explorer-layout {
+            height: 100%;
+            display: flex;
+        }
+        .explorer-sidebar {
+            width: 170px;
+            background: rgba(10, 15, 23, 0.7);
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 10px;
+        }
+        .side-folder {
+            padding: 7px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 3px;
+            color: var(--text-muted);
+        }
+        .side-folder.active, .side-folder:hover {
+            background: rgba(0, 210, 255, 0.12);
+            color: var(--accent-cyan);
+        }
+        .explorer-main {
+            flex: 1;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
-
-        .boot-logs {
-            flex: 1;
+        .explorer-breadcrumb {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 6px 12px;
+            border-radius: 4px;
             font-size: 12px;
-            line-height: 1.45;
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-cyan);
+            margin-bottom: 14px;
+        }
+        .explorer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 14px;
+        }
+        .file-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 6px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .file-card:hover {
+            background: rgba(0, 210, 255, 0.12);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+        }
+        .file-card i {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+        .file-card span {
+            font-size: 11px;
+            word-break: break-all;
         }
 
-        .boot-bottom-bar {
-            padding-top: 12px;
+        /* 3. PDF RESUME VIEWER */
+        .resume-viewer-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #1e293b;
+        }
+        .resume-toolbar {
+            background: #0f172a;
+            padding: 8px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid var(--term-border);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .resume-page-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            background: #334155;
+        }
+        .resume-sheet {
+            background: white;
+            color: #0f172a;
+            width: 740px;
+            min-height: 980px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
         }
 
-        .skip-btn {
-            background: transparent;
-            border: 1px solid var(--term-fg);
-            color: var(--term-fg);
-            padding: 6px 14px;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            box-shadow: 0 0 8px var(--term-glow);
-            animation: pulse 1.5s infinite;
+        /* 4. WEB BROWSER APP */
+        .browser-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #0d131d;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+        .browser-top {
+            background: #111a28;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 6px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .browser-tabs {
+            display: flex;
+            gap: 4px;
+        }
+        .b-tab {
+            background: rgba(255,255,255,0.05);
+            padding: 4px 12px;
+            border-radius: 4px 4px 0 0;
+            font-size: 11.5px;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .b-tab.active {
+            background: rgba(0, 210, 255, 0.15);
+            color: var(--accent-cyan);
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+        .browser-nav-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .browser-url-input {
+            flex: 1;
+            background: #070c14;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 20px;
+            padding: 4px 14px;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            outline: none;
+        }
+        .browser-bookmarks {
+            display: flex;
+            gap: 10px;
+            padding: 4px 6px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            font-size: 11px;
+            overflow-x: auto;
+        }
+        .b-bookmark {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .b-bookmark:hover { color: var(--accent-cyan); }
+        .browser-viewport {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+            background: #0a0f18;
+        }
+
+        /* 5. GHIDRA REVERSE TOOL SIMULATOR */
+        .ghidra-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #131722;
+            font-family: 'Fira Code', monospace;
+        }
+        .ghidra-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .ghidra-tree {
+            width: 190px;
+            background: #0c0f17;
+            border-right: 1px solid rgba(255,255,255,0.08);
+            padding: 8px;
+            font-size: 11px;
+        }
+        .ghidra-code {
+            flex: 1;
+            padding: 12px;
+            background: #090c12;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        /* Generic Buttons & Tags */
+        .btn-ui {
+            background: rgba(0, 210, 255, 0.12);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-ui:hover {
+            background: var(--accent-cyan);
+            color: #000;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+        .btn-green {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: rgba(0, 255, 157, 0.1);
+        }
+        .btn-green:hover {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+        .tag-badge {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-size: 11px;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        /* Mobile tweaks */
+        @media (max-width: 640px) {
+            .desktop-icons-container {
+                grid-template-rows: repeat(auto-fill, 78px);
+                gap: 6px;
+                padding: 10px;
+            }
+            .desktop-icon {
+                width: 72px;
+                height: 74px;
+            }
+            .desktop-icon i { font-size: 24px; }
+            .desktop-icon .icon-name { font-size: 9.5px; }
+            #app-menu { width: 95vw; left: 2.5vw; }
+            .os-window { min-width: 96vw; }
         }
     </style>
 </head>
-<body data-theme="green">
-    <div class="crt-overlay"></div>
-    <div class="crt-flicker"></div>
+<body>
 
-    <!-- BOOTING SEQUENCE OVERLAY -->
-    <div id="boot-screen">
-        <div class="boot-logs" id="boot-logs"></div>
-        <div class="boot-bottom-bar">
-            <span class="txt-dim">[SYSTEM BOOT SEQUENCE ENGAGED]</span>
-            <button class="skip-btn" id="skip-boot-btn" onclick="terminateBoot()">SKIP BOOT [ESC / CLICK]</button>
+    <!-- TOP PANEL / TASKBAR -->
+    <div id="top-panel">
+        <div class="panel-left">
+            <button class="app-menu-btn" onclick="toggleAppMenu()">
+                <i class="fa-solid fa-dragon"></i> Applications
+            </button>
+            <div class="panel-tasks" id="taskbar-tasks"></div>
+        </div>
+
+        <div class="panel-right">
+            <div class="sys-tray-item" onclick="openWindow('win-terminal')"><i class="fa-solid fa-terminal color-term"></i></div>
+            <div class="sys-tray-item"><i class="fa-solid fa-shield-halved color-cyan"></i> Root OK</div>
+            <div class="sys-tray-item"><i class="fa-solid fa-wifi color-term"></i></div>
+            <div class="sys-tray-item"><i class="fa-solid fa-volume-high"></i></div>
+            <div class="sys-tray-item sys-time" id="system-clock">12:00:00</div>
         </div>
     </div>
 
-    <!-- MAIN TERMINAL APP -->
-    <div class="terminal-window">
-        <div class="terminal-bar">
-            <div class="terminal-bar-left">
-                <div class="terminal-dots">
-                    <span class="dot dot-red"></span>
-                    <span class="dot dot-yellow"></span>
-                    <span class="dot dot-green"></span>
+    <!-- MAIN DESKTOP WORKSPACE -->
+    <div id="desktop" oncontextmenu="openContextMenu(event)" onclick="closeAllPopups(event)">
+        <!-- Wallpaper watermark -->
+        <div class="desktop-watermark">
+            <h1>PARROT_SEC</h1>
+            <p>JAYDEEP SHIRSATH // THREAT LABS v5.4</p>
+        </div>
+
+        <!-- Desktop Application Grid -->
+        <div class="desktop-icons-container">
+            <div class="desktop-icon" onclick="openWindow('win-terminal')">
+                <i class="fa-solid fa-terminal color-term"></i>
+                <span class="icon-name">Terminal</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('win-explorer')">
+                <i class="fa-solid fa-folder-closed color-folder"></i>
+                <span class="icon-name">File Manager</span>
+            </div>
+            <div class="desktop-icon" onclick="openResumeViewer()">
+                <i class="fa-solid fa-file-pdf color-pdf"></i>
+                <span class="icon-name">resume.pdf</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('win-browser')">
+                <i class="fa-solid fa-compass color-browser"></i>
+                <span class="icon-name">CyberNet Browser</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('win-github')">
+                <i class="fa-brands fa-github color-gh"></i>
+                <span class="icon-name">GitHub</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('win-youtube')">
+                <i class="fa-brands fa-youtube color-yt"></i>
+                <span class="icon-name">YouTube (@js44)</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('win-linkedin')">
+                <i class="fa-brands fa-linkedin color-li"></i>
+                <span class="icon-name">LinkedIn</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('win-thm')">
+                <i class="fa-solid fa-cube color-thm"></i>
+                <span class="icon-name">HTB &amp; THM Hub</span>
+            </div>
+            <div class="desktop-icon" onclick="openWindow('win-ghidra')">
+                <i class="fa-solid fa-microchip color-tool"></i>
+                <span class="icon-name">Ghidra Tool</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- START MENU / APPLICATION MENU -->
+    <div id="app-menu">
+        <div class="menu-header">
+            <div class="menu-user-avatar">JS</div>
+            <div class="menu-user-info">
+                <h3>Jaydeep Shirsath</h3>
+                <p>guest@parrot-security-deck [BCA Cybersecurity '28]</p>
+            </div>
+        </div>
+        <div class="menu-body">
+            <div class="menu-categories">
+                <div class="cat-item active" onclick="filterMenuCategory('all', this)"><i class="fa-solid fa-border-all"></i> All Tools</div>
+                <div class="cat-item" onclick="filterMenuCategory('offensive', this)"><i class="fa-solid fa-skull"></i> Exploitation</div>
+                <div class="cat-item" onclick="filterMenuCategory('recon', this)"><i class="fa-solid fa-binoculars"></i> Recon &amp; Forensics</div>
+                <div class="cat-item" onclick="filterMenuCategory('identity', this)"><i class="fa-solid fa-id-badge"></i> Dossier &amp; Links</div>
+            </div>
+            <div class="menu-items-list" id="menu-app-list">
+                <div class="menu-app-item" data-category="offensive" onclick="openWindow('win-terminal'); toggleAppMenu()"><i class="fa-solid fa-terminal color-term"></i> Terminal (Hacker Shell)</div>
+                <div class="menu-app-item" data-category="recon" onclick="openResumeViewer(); toggleAppMenu()"><i class="fa-solid fa-file-pdf color-pdf"></i> View &amp; Print Resume PDF</div>
+                <div class="menu-app-item" data-category="recon" onclick="openWindow('win-explorer'); toggleAppMenu()"><i class="fa-solid fa-folder-open color-folder"></i> File Explorer (Documents)</div>
+                <div class="menu-app-item" data-category="recon" onclick="openWindow('win-ghidra'); toggleAppMenu()"><i class="fa-solid fa-microchip color-tool"></i> Ghidra Disassembler</div>
+                <div class="menu-app-item" data-category="offensive" onclick="openWindow('win-thm'); toggleAppMenu()"><i class="fa-solid fa-fire color-thm"></i> Hack The Box &amp; TryHackMe</div>
+                <div class="menu-app-item" data-category="identity" onclick="openWindow('win-browser'); toggleAppMenu()"><i class="fa-solid fa-compass color-browser"></i> CyberNet Navigator</div>
+                <div class="menu-app-item" data-category="identity" onclick="openWindow('win-github'); toggleAppMenu()"><i class="fa-brands fa-github color-gh"></i> GitHub (@Jaydeep-Shirsath)</div>
+                <div class="menu-app-item" data-category="identity" onclick="openWindow('win-youtube'); toggleAppMenu()"><i class="fa-brands fa-youtube color-yt"></i> YouTube Channel (@js44)</div>
+                <div class="menu-app-item" data-category="identity" onclick="openWindow('win-linkedin'); toggleAppMenu()"><i class="fa-brands fa-linkedin color-li"></i> LinkedIn Profile</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT CLICK DESKTOP CONTEXT MENU -->
+    <div id="context-menu">
+        <div class="context-item" onclick="openWindow('win-terminal')"><i class="fa-solid fa-terminal color-term"></i> Open Terminal</div>
+        <div class="context-item" onclick="openWindow('win-explorer')"><i class="fa-solid fa-folder color-folder"></i> Open Files</div>
+        <div class="context-item" onclick="openResumeViewer()"><i class="fa-solid fa-file-pdf color-pdf"></i> Read Resume.pdf</div>
+        <div class="context-divider"></div>
+        <div class="context-item" onclick="cycleWallpaper()"><i class="fa-solid fa-image"></i> Change Theme Color</div>
+        <div class="context-item" onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i> Refresh Deck</div>
+    </div>
+
+    <!-- ==================== WINDOW MANAGED WINDOWS ==================== -->
+
+    <!-- 1. TERMINAL WINDOW -->
+    <div class="os-window" id="win-terminal" style="top: 70px; left: 80px; width: 680px; height: 440px;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-terminal')">
+            <div class="win-title"><i class="fa-solid fa-terminal color-term"></i> jaydeep@parrot-sec: ~/portfolio</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-terminal')"><i class="fa-solid fa-minus"></i></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-terminal')"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-terminal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+        <div class="win-body">
+            <div class="terminal-container" onclick="document.getElementById('term-cmd-input').focus()">
+                <div class="terminal-output" id="term-history">
+                    <pre style="color:var(--accent-cyan); font-weight:bold; font-size:11px; margin-bottom:8px;">
+ ____                           _   ____             
+|  _ \ __ _ _ __ _ __ ___   ___| | / ___|  ___  ___  
+| |_) / _` | '__| '__/ _ \ / _ \ | \___ \ / _ \/ __| 
+|  __/ (_| | |  | | | (_) |  __/ |  ___) |  __/ (__  
+|_|   \__,_|_|  |_|  \___/ \___|_| |____/ \___|\___| 
+[Parrot Security OS v5.4 - Jaydeep Shirsath Cyber Deck]
+                    </pre>
+                    <div>Type <span style="color:var(--accent-cyan); font-weight:bold;">help</span> to inspect valid operations, or click desktop icons.</div>
+                    <div style="color:var(--text-muted); margin-bottom: 6px;">Quick commands: <span style="color:#fff">about, skills, projects, privesc, certs, resume, contact</span></div>
                 </div>
-                <span><strong>jaydeep@parrot-sec</strong>: ~/portfolio</span>
-            </div>
-            <div class="terminal-bar-controls">
-                <span id="audio-toggle" class="top-btn" onclick="toggleAudio()">AUDIO: OFF [CLICK]</span>
-                <span class="top-btn" onclick="cycleTheme()">THEME [T]</span>
-                <span class="top-btn" onclick="executeCommand('clear')">CLEAR</span>
-            </div>
-        </div>
-
-        <div class="terminal-viewport" id="viewport">
-            <div id="history"></div>
-            
-            <!-- GUIDED QUICK-ACTION CHIPS FOR VISITORS -->
-            <div class="chip-container" id="quick-chips">
-                <div class="chip-label">Interactive Guidance: Tap any module below to investigate</div>
-                <button class="chip-btn" onclick="executeCommand('about')">❯ about</button>
-                <button class="chip-btn" onclick="executeCommand('skills')">❯ skills</button>
-                <button class="chip-btn" onclick="executeCommand('projects')">❯ projects</button>
-                <button class="chip-btn" onclick="executeCommand('privesc')">❯ privesc</button>
-                <button class="chip-btn" onclick="executeCommand('platforms')">❯ platforms</button>
-                <button class="chip-btn" onclick="executeCommand('mentorship')">❯ mentorship</button>
-                <button class="chip-btn" onclick="executeCommand('certs')">❯ certs</button>
-                <button class="chip-btn" onclick="executeCommand('contact')">❯ contact</button>
-                <button class="chip-btn" onclick="executeCommand('whoami')">❯ whoami</button>
-                <button class="chip-btn" onclick="executeCommand('cat flag.txt')">❯ cat flag.txt</button>
-                <button class="chip-btn" onclick="executeCommand('help')">❯ help</button>
-            </div>
-        </div>
-
-        <!-- COMMAND PROMPT ROW -->
-        <div class="cli-row">
-            <span class="cli-prompt">guest@jaydeep-sec:~$</span>
-            <div class="cli-input-wrapper">
-                <input type="text" id="cli-input" class="cli-input" autofocus autocomplete="off" spellcheck="false" placeholder="type 'help' or click any button above...">
+                <div class="term-prompt-row">
+                    <span class="term-prompt">jaydeep@parrot-sec:~$</span>
+                    <input type="text" id="term-cmd-input" class="term-input" autocomplete="off" spellcheck="false" autofocus>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- 2. FILE EXPLORER WINDOW -->
+    <div class="os-window" id="win-explorer" style="top: 100px; left: 160px; width: 640px; height: 420px; display: none;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-explorer')">
+            <div class="win-title"><i class="fa-solid fa-folder-closed color-folder"></i> File Manager - /home/jaydeep</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-explorer')"></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-explorer')"></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-explorer')"></button>
+            </div>
+        </div>
+        <div class="win-body">
+            <div class="explorer-layout">
+                <div class="explorer-sidebar">
+                    <div class="side-folder active"><i class="fa-solid fa-house"></i> Home</div>
+                    <div class="side-folder"><i class="fa-solid fa-desktop"></i> Desktop</div>
+                    <div class="side-folder"><i class="fa-solid fa-file-contract"></i> Documents</div>
+                    <div class="side-folder"><i class="fa-solid fa-shield-virus"></i> Exploits &amp; CTF</div>
+                    <div class="side-folder"><i class="fa-solid fa-certificate"></i> Credentials</div>
+                </div>
+                <div class="explorer-main">
+                    <div class="explorer-breadcrumb">/home/jaydeep/portfolio/</div>
+                    <div class="explorer-grid">
+                        <div class="file-card" onclick="openResumeViewer()">
+                            <i class="fa-solid fa-file-pdf color-pdf"></i>
+                            <span>Jaydeep_Resume.pdf</span>
+                        </div>
+                        <div class="file-card" onclick="openWindow('win-ghidra')">
+                            <i class="fa-solid fa-binary color-tool"></i>
+                            <span>reverse_eng.elf</span>
+                        </div>
+                        <div class="file-card" onclick="openWindow('win-terminal')">
+                            <i class="fa-solid fa-terminal color-term"></i>
+                            <span>privesc_audit.sh</span>
+                        </div>
+                        <div class="file-card" onclick="openWindow('win-browser')">
+                            <i class="fa-solid fa-globe color-browser"></i>
+                            <span>bookmarks.url</span>
+                        </div>
+                        <div class="file-card" onclick="openWindow('win-thm')">
+                            <i class="fa-solid fa-flag color-thm"></i>
+                            <span>captured_flags.txt</span>
+                        </div>
+                        <div class="file-card" onclick="openWindow('win-github')">
+                            <i class="fa-brands fa-git-alt" style="color:#f34f29;"></i>
+                            <span>git_repos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. IN-OS PDF RESUME VIEWER WINDOW -->
+    <div class="os-window" id="win-resume" style="top: 50px; left: 120px; width: 780px; height: 520px; display: none;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-resume')">
+            <div class="win-title"><i class="fa-solid fa-file-pdf color-pdf"></i> Document Viewer - Jaydeep_Shirsath_Resume.pdf</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-resume')"></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-resume')"></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-resume')"></button>
+            </div>
+        </div>
+        <div class="win-body">
+            <div class="resume-viewer-container">
+                <div class="resume-toolbar">
+                    <span style="font-size:12px; color:var(--text-muted);"><i class="fa-solid fa-check-circle color-term"></i> Verified Document (Page 1/1)</span>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-ui btn-green" onclick="window.print()"><i class="fa-solid fa-print"></i> Print / Save PDF</button>
+                        <a class="btn-ui" href="mailto:jaydeepshirsath13@gmail.com"><i class="fa-solid fa-paper-plane"></i> Hire Jaydeep</a>
+                    </div>
+                </div>
+                <div class="resume-page-view">
+                    <div class="resume-sheet">
+                        <div style="border-bottom: 2px solid #0f172a; padding-bottom: 6px; margin-bottom: 10px;">
+                            <h1 style="font-size: 20px; font-weight: 800; color:#0f172a; margin-bottom:2px;">JAYDEEP SHIRSATH</h1>
+                            <div style="color:#0284c7; font-weight:700; font-size:13px; margin-bottom: 4px;">CYBERSECURITY SPECIALIST &amp; PENETRATION TESTING ENTHUSIAST</div>
+                            <div style="font-size:11px; color:#475569; display:flex; flex-wrap:wrap; gap:8px;">
+                                <span>📧 jaydeepshirsath13@gmail.com</span>
+                                <span>📱 +91 9270479845</span>
+                                <span>📍 Pune, India</span>
+                                <span>🔗 BCA (Cybersecurity) ADYPU '28</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <h3 style="font-size:12px; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:2px; margin-bottom:4px; color:#0f172a;">Executive Summary</h3>
+                            <p style="font-size:11px; color:#334155; line-height: 1.45;">
+                                Hands-on undergraduate cybersecurity practitioner specializing in offensive penetration testing, unrestricted file upload bypasses, reverse shell orchestration, and horizontal/vertical privilege escalation. Experienced in decompilation using Ghidra, steganography (Steghide, ExifTool, Audacity), and Linux/Cloud IAM permissions. Recognized on campus as Technical Lead for MindMesh Club, troubleshooting software, hypervisors, and dependencies for students and faculty.
+                            </p>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <h3 style="font-size:12px; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:2px; margin-bottom:4px; color:#0f172a;">Technical Weapons &amp; Capabilities</h3>
+                            <div style="font-size:11px; line-height:1.5;">
+                                <strong>Offensive Security:</strong> Privilege Escalation (Linux SUID/SGID, sudoers, Windows paths), File Upload RCE, Reverse Shells (TTY stabilization), THC-Hydra, John the Ripper, Burp Suite.<br>
+                                <strong>Reverse Eng &amp; Forensics:</strong> Ghidra Decompiler, readelf, CyberChef recipes, Steghide, ExifTool, Audacity spectrograms.<br>
+                                <strong>Recon &amp; Access Controls:</strong> Nmap (NSE scripts), Wireshark, Linux User Permissions (chmod, chown), Cloud IAM least-privilege.<br>
+                                <strong>Hypervisors &amp; Languages:</strong> VMware Workstation, Oracle VM VirtualBox, Python, C/C++, Bash, SQL.
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <h3 style="font-size:12px; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:2px; margin-bottom:4px; color:#0f172a;">Education &amp; Leadership</h3>
+                            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:11.5px;">
+                                <span>Bachelor of Computer Applications (BCA) - Cybersecurity</span>
+                                <span>Expected 2028</span>
+                            </div>
+                            <div style="color:#0284c7; font-size:11px;">Ajeenkya DY Patil University (ADYPU), Pune</div>
+                            <div style="font-size:11px; margin-top:3px;">
+                                <strong>Technical Lead &amp; Cybersecurity Lead (MindMesh Club):</strong> Troubleshoot cybersecurity tools and runtime environments for peers and college faculty; host hands-on CTF bootcamps.
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 style="font-size:12px; text-transform:uppercase; border-bottom:1px solid #cbd5e1; padding-bottom:2px; margin-bottom:4px; color:#0f172a;">Verified Badges &amp; Portals</h3>
+                            <div style="font-size:11px;">
+                                • <strong>TryHackMe &amp; HTB:</strong> Hands-on machine pwnage and CTF root flags.<br>
+                                • <strong>Google Cloud Arcade Facilitator:</strong> Cloud IAM and Infrastructure verification (Credly badge).<br>
+                                • <strong>Technical Content Creator:</strong> YouTube channel <strong>@js44</strong> walkthroughs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. CYBERNET BROWSER WINDOW -->
+    <div class="os-window" id="win-browser" style="top: 80px; left: 190px; width: 720px; height: 460px; display: none;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-browser')">
+            <div class="win-title"><i class="fa-solid fa-compass color-browser"></i> CyberNet Navigator</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-browser')"></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-browser')"></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-browser')"></button>
+            </div>
+        </div>
+        <div class="win-body">
+            <div class="browser-container">
+                <div class="browser-top">
+                    <div class="browser-tabs">
+                        <div class="b-tab active"><i class="fa-solid fa-shield-halved"></i> Security Hub</div>
+                        <div class="b-tab" onclick="window.open('https://github.com/Jaydeep-Shirsath', '_blank')"><i class="fa-brands fa-github"></i> GitHub <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;"></i></div>
+                    </div>
+                    <div class="browser-nav-bar">
+                        <i class="fa-solid fa-arrow-left" style="color:var(--text-muted); cursor:pointer;"></i>
+                        <i class="fa-solid fa-arrow-right" style="color:var(--text-muted); cursor:pointer;"></i>
+                        <i class="fa-solid fa-rotate-right" style="color:var(--text-muted); cursor:pointer;"></i>
+                        <input type="text" class="browser-url-input" id="browser-url-bar" value="https://jaydeep-security.net/home" readonly>
+                    </div>
+                    <div class="browser-bookmarks">
+                        <span class="b-bookmark" onclick="loadBrowserUrl('https://github.com/Jaydeep-Shirsath')"><i class="fa-brands fa-github"></i> GitHub</span>
+                        <span class="b-bookmark" onclick="loadBrowserUrl('https://tryhackme.com/p/Jaydeep.Shirsath')"><i class="fa-solid fa-cube"></i> TryHackMe</span>
+                        <span class="b-bookmark" onclick="loadBrowserUrl('https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url')"><i class="fa-solid fa-cube"></i> HackTheBox</span>
+                        <span class="b-bookmark" onclick="loadBrowserUrl('https://www.linkedin.com/in/jaydeep-shirsath-82452a380')"><i class="fa-brands fa-linkedin"></i> LinkedIn</span>
+                        <span class="b-bookmark" onclick="loadBrowserUrl('https://youtube.com/@js44')"><i class="fa-brands fa-youtube"></i> YouTube</span>
+                        <span class="b-bookmark" onclick="loadBrowserUrl('https://www.credly.com/users/jaydeep-shirsath')"><i class="fa-solid fa-certificate"></i> Credly</span>
+                    </div>
+                </div>
+                <div class="browser-viewport" id="browser-content-area">
+                    <div style="text-align:center; padding: 25px 15px;">
+                        <h2 style="color:var(--accent-cyan); margin-bottom:8px;"><i class="fa-solid fa-network-wired"></i> CyberNet Portal // Jaydeep Shirsath</h2>
+                        <p style="color:var(--text-muted); max-width:550px; margin: 0 auto 20px auto; font-size:12.5px;">
+                            Quickly access verified security profile nodes and external profiles. Click any module below to inspect or open in an external window:
+                        </p>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; max-width:620px; margin: 0 auto;">
+                            <div class="file-card" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);" onclick="window.open('https://github.com/Jaydeep-Shirsath', '_blank')">
+                                <i class="fa-brands fa-github" style="font-size:28px;"></i>
+                                <strong style="margin-top:6px;">GitHub Repositories</strong>
+                                <span style="font-size:10.5px; color:var(--text-muted);">@Jaydeep-Shirsath</span>
+                            </div>
+                            <div class="file-card" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);" onclick="window.open('https://tryhackme.com/p/Jaydeep.Shirsath', '_blank')">
+                                <i class="fa-solid fa-cube color-thm" style="font-size:28px;"></i>
+                                <strong style="margin-top:6px;">TryHackMe Profile</strong>
+                                <span style="font-size:10.5px; color:var(--text-muted);">Jaydeep.Shirsath</span>
+                            </div>
+                            <div class="file-card" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);" onclick="window.open('https://youtube.com/@js44', '_blank')">
+                                <i class="fa-brands fa-youtube color-yt" style="font-size:28px;"></i>
+                                <strong style="margin-top:6px;">YouTube Channel</strong>
+                                <span style="font-size:10.5px; color:var(--text-muted);">@js44 Walkthroughs</span>
+                            </div>
+                            <div class="file-card" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);" onclick="window.open('https://www.linkedin.com/in/jaydeep-shirsath-82452a380', '_blank')">
+                                <i class="fa-brands fa-linkedin color-li" style="font-size:28px;"></i>
+                                <strong style="margin-top:6px;">LinkedIn Network</strong>
+                                <span style="font-size:10.5px; color:var(--text-muted);">Jaydeep Shirsath</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. GITHUB APPLICATION WINDOW -->
+    <div class="os-window" id="win-github" style="top: 90px; left: 220px; width: 620px; height: 420px; display: none;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-github')">
+            <div class="win-title"><i class="fa-brands fa-github color-gh"></i> GitHub Explorer - Jaydeep-Shirsath</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-github')"></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-github')"></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-github')"></button>
+            </div>
+        </div>
+        <div class="win-body" style="padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:12px; margin-bottom:14px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fa-brands fa-github" style="font-size:38px;"></i>
+                    <div>
+                        <h2 style="font-size:16px;">Jaydeep-Shirsath</h2>
+                        <p style="font-size:12px; color:var(--text-muted);">Offensive Security &amp; Cyber Defense Scripts</p>
+                    </div>
+                </div>
+                <a href="https://github.com/Jaydeep-Shirsath" target="_blank" class="btn-ui"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open in GitHub</a>
+            </div>
+            <div style="display:grid; gap:10px;">
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:12px; border-radius:6px;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong style="color:var(--accent-cyan); font-family:'Fira Code', monospace;">CTF-Exploits-PrivEsc</strong>
+                        <span class="tag-badge">Python / Shell</span>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Automation scripts for TTY shell stabilization, SUID permission auditing, and password cracking workflows.</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); padding:12px; border-radius:6px;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong style="color:var(--accent-cyan); font-family:'Fira Code', monospace;">SIH-Digital-Forensics</strong>
+                        <span class="tag-badge">C++ / Forensic</span>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">File carving architecture models and raw disk image recovery prototype submitted for Smart India Hackathon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. YOUTUBE CHANNEL WINDOW -->
+    <div class="os-window" id="win-youtube" style="top: 110px; left: 240px; width: 640px; height: 420px; display: none;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-youtube')">
+            <div class="win-title"><i class="fa-brands fa-youtube color-yt"></i> YouTube Player - @js44</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-youtube')"></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-youtube')"></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-youtube')"></button>
+            </div>
+        </div>
+        <div class="win-body" style="padding:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="fa-brands fa-youtube color-yt" style="font-size:32px;"></i>
+                    <div>
+                        <h3 style="font-size:15px;">Jaydeep Shirsath (@js44)</h3>
+                        <p style="font-size:11.5px; color:var(--text-muted);">Cybersecurity Walkthroughs &amp; Lab Solutions</p>
+                    </div>
+                </div>
+                <a href="https://youtube.com/@js44?si=4xPaJYq3JOWW5VBK" target="_blank" class="btn-ui btn-green"><i class="fa-solid fa-play"></i> Visit YouTube Channel</a>
+            </div>
+            <div style="background:#000; border-radius:8px; padding:24px; text-align:center; border:1px solid rgba(255,255,255,0.1);">
+                <i class="fa-solid fa-video color-cyan" style="font-size:44px; margin-bottom:10px;"></i>
+                <h4>Video Guides &amp; Student Mentorship Streams</h4>
+                <p style="font-size:12px; color:var(--text-muted); max-width:440px; margin:6px auto 14px auto;">
+                    Step-by-step videos breaking down Linux configuration, CTF problem solving, and troubleshooting hypervisors (VirtualBox / VMware).
+                </p>
+                <a href="https://youtube.com/@js44" target="_blank" class="btn-ui"><i class="fa-brands fa-youtube"></i> Launch @js44 Feed</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. LINKEDIN WINDOW -->
+    <div class="os-window" id="win-linkedin" style="top: 100px; left: 260px; width: 620px; height: 440px; display: none;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-linkedin')">
+            <div class="win-title"><i class="fa-brands fa-linkedin color-li"></i> LinkedIn Dossier</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-linkedin')"></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-linkedin')"></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-linkedin')"></button>
+            </div>
+        </div>
+        <div class="win-body" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:12px; margin-bottom:14px;">
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <div class="menu-user-avatar" style="width:50px; height:50px;">JS</div>
+                    <div>
+                        <h2>Jaydeep Shirsath</h2>
+                        <p style="color:var(--accent-cyan); font-size:12px;">Cybersecurity Student @ ADYPU | Tech Lead @ MindMesh</p>
+                    </div>
+                </div>
+                <a href="https://www.linkedin.com/in/jaydeep-shirsath-82452a380?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="btn-ui"><i class="fa-brands fa-linkedin"></i> View Profile</a>
+            </div>
+            <div style="font-size:12.5px; line-height:1.5; color:var(--text-main);">
+                <p><strong>Campus Leadership:</strong> Serving as Technical Lead &amp; Cybersecurity Lead for MindMesh Club. Guiding students in tool installations, ethical hacking workflows, and debugging runtime errors for university faculty members.</p>
+                <br>
+                <p><strong>Current Goal:</strong> Seeking Summer &amp; Winter Cybersecurity Internships in Penetration Testing, Threat Auditing, or Security Operations (SOC).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. TRYHACKME & HTB WINDOW -->
+    <div class="os-window" id="win-thm" style="top: 120px; left: 280px; width: 640px; height: 430px; display: none;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-thm')">
+            <div class="win-title"><i class="fa-solid fa-cube color-thm"></i> HackTheBox &amp; TryHackMe Intelligence</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-thm')"></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-thm')"></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-thm')"></button>
+            </div>
+        </div>
+        <div class="win-body" style="padding:16px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+                <div style="background:rgba(255,51,51,0.06); border:1px solid rgba(255,51,51,0.25); border-radius:6px; padding:12px;">
+                    <h3 style="color:#ff4d4d; font-size:14px; margin-bottom:6px;"><i class="fa-solid fa-fire"></i> TryHackMe</h3>
+                    <p style="font-size:12px; color:var(--text-muted);">Active Machine Pwnage, Network Security, and Web Exploits.</p>
+                    <a href="https://tryhackme.com/p/Jaydeep.Shirsath" target="_blank" class="btn-ui btn-green" style="margin-top:10px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit THM Badge</a>
+                </div>
+                <div style="background:rgba(0,255,157,0.06); border:1px solid rgba(0,255,157,0.25); border-radius:6px; padding:12px;">
+                    <h3 style="color:var(--accent-green); font-size:14px; margin-bottom:6px;"><i class="fa-solid fa-cube"></i> Hack The Box</h3>
+                    <p style="font-size:12px; color:var(--text-muted);">CTF Labs, PrivEsc (SUID &amp; Sudoers), and Foothold Practice.</p>
+                    <a href="https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url" target="_blank" class="btn-ui" style="margin-top:10px;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visit HTB Profile</a>
+                </div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:6px; padding:12px;">
+                <h4 style="font-size:12.5px; color:var(--accent-cyan); margin-bottom:6px;">Proven Attack Vectors:</h4>
+                <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                    <span class="tag-badge">Unrestricted File Upload</span>
+                    <span class="tag-badge">Web Shells (PHP/Bash)</span>
+                    <span class="tag-badge">Netcat Reverse Shells</span>
+                    <span class="tag-badge">TTY Upgrades</span>
+                    <span class="tag-badge">THC-Hydra</span>
+                    <span class="tag-badge">John The Ripper</span>
+                    <span class="tag-badge">SUID/SGID Abuse</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. GHIDRA REVERSE TOOL WINDOW -->
+    <div class="os-window" id="win-ghidra" style="top: 80px; left: 140px; width: 680px; height: 440px; display: none;">
+        <div class="win-titlebar" onmousedown="startDragWindow(event, 'win-ghidra')">
+            <div class="win-title"><i class="fa-solid fa-microchip color-tool"></i> Ghidra 11.0.2 - [auth_verifier.elf] Decompiler</div>
+            <div class="win-controls">
+                <button class="win-btn win-btn-min" onclick="minimizeWindow('win-ghidra')"></button>
+                <button class="win-btn win-btn-max" onclick="maximizeWindow('win-ghidra')"></button>
+                <button class="win-btn win-btn-close" onclick="closeWindow('win-ghidra')"></button>
+            </div>
+        </div>
+        <div class="win-body">
+            <div class="ghidra-container">
+                <div style="background:#1a202c; padding:6px 12px; font-size:11px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between;">
+                    <span>Target: <strong>auth_verifier.elf (x86_64 ELF LSB)</strong></span>
+                    <span style="color:var(--accent-green);"><i class="fa-solid fa-circle-check"></i> Disassembly Clean</span>
+                </div>
+                <div class="ghidra-layout">
+                    <div class="ghidra-tree">
+                        <div style="color:var(--accent-cyan); margin-bottom:4px;">Symbol Tree</div>
+                        <div>▸ .init</div>
+                        <div>▾ Functions</div>
+                        <div style="color:var(--accent-green); padding-left:10px;">• main()</div>
+                        <div style="color:var(--accent-green); padding-left:10px;">• check_license()</div>
+                        <div style="color:var(--accent-green); padding-left:10px;">• grant_root_privs()</div>
+                        <div>▸ .rodata</div>
+                        <div>▸ .got.plt</div>
+                    </div>
+                    <div class="ghidra-code">
+                        <div style="color:#64748b;">// Decompiled C representation - Ghidra Engine</div>
+                        <div style="color:var(--accent-purple);">undefined8 <span style="color:#60a5fa;">grant_root_privs</span>(char *input_key)</div>
+                        <div>{</div>
+                        <div style="padding-left:16px; color:#cbd5e1;">int strcmp_result;</div>
+                        <div style="padding-left:16px; color:#cbd5e1;">strcmp_result = strcmp(input_key, <span style="color:#38bdf8;">"ADYPU_2028_ROOT_ACCESS"</span>);</div>
+                        <div style="padding-left:16px;">if (strcmp_result == 0) {</div>
+                        <div style="padding-left:32px; color:var(--accent-green);">setuid(0);  <span style="color:#64748b;">// Elevation condition detected!</span></div>
+                        <div style="padding-left:32px; color:var(--accent-green);">system(<span style="color:#38bdf8;">"/bin/bash -p"</span>);</div>
+                        <div style="padding-left:32px;">return 1;</div>
+                        <div style="padding-left:16px;">}</div>
+                        <div style="padding-left:16px; color:#f87171;">puts("[-] Verification failed. Intrusion flagged.");</div>
+                        <div style="padding-left:16px;">return 0;</div>
+                        <div>}</div>
+                        <br>
+                        <div style="color:#64748b;">// Use ExifTool, Steghide, or CyberChef for multi-stage payloads.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT SIMULATOR LOGIC -->
     <script>
-        // Web Audio API Synthetic Retro Sound Engine
-        let audioContext = null;
-        let audioMuted = true;
+        // System Clock Tick
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            document.getElementById('system-clock').innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        function initAudio() {
-            if (!audioContext) {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                if (AudioCtx) audioContext = new AudioCtx();
-            }
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume();
-            }
+        // Window Manager State
+        let highestZ = 100;
+        const activeWindows = new Set(['win-terminal']);
+
+        function bringToFront(winId) {
+            const win = document.getElementById(winId);
+            if (!win) return;
+            highestZ++;
+            win.style.zIndex = highestZ;
+            updateTaskbar();
         }
 
-        function playKeySound(type = 'key') {
-            if (audioMuted || !audioContext) return;
-            try {
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-
-                const now = audioContext.currentTime;
-                if (type === 'beep') {
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(880, now);
-                    gain.gain.setValueAtTime(0.06, now);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
-                    osc.start(now);
-                    osc.stop(now + 0.12);
-                } else if (type === 'enter') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(320, now);
-                    gain.gain.setValueAtTime(0.07, now);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
-                    osc.start(now);
-                    osc.stop(now + 0.08);
-                } else {
-                    // Click sound
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(550 + Math.random() * 200, now);
-                    gain.gain.setValueAtTime(0.025, now);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
-                    osc.start(now);
-                    osc.stop(now + 0.035);
-                }
-            } catch (e) {
-                // Ignore audio failure
-            }
+        function openWindow(winId) {
+            const win = document.getElementById(winId);
+            if (!win) return;
+            win.style.display = 'flex';
+            win.classList.remove('minimized');
+            bringToFront(winId);
+            activeWindows.add(winId);
+            updateTaskbar();
         }
 
-        function toggleAudio() {
-            initAudio();
-            audioMuted = !audioMuted;
-            document.getElementById('audio-toggle').innerText = audioMuted ? 'AUDIO: OFF [CLICK]' : 'AUDIO: ON [BEEP]';
-            if (!audioMuted) playKeySound('beep');
+        function closeWindow(winId) {
+            const win = document.getElementById(winId);
+            if (!win) return;
+            win.style.display = 'none';
+            activeWindows.delete(winId);
+            updateTaskbar();
         }
 
-        // Theme Manager
-        const themes = ['green', 'amber', 'cyber', 'blood'];
-        let currentThemeIdx = 0;
-        function cycleTheme() {
-            currentThemeIdx = (currentThemeIdx + 1) % themes.length;
-            document.body.setAttribute('data-theme', themes[currentThemeIdx]);
-            appendOutput(`<span class="txt-accent">[SYSTEM] Switched color profile to: <strong>${themes[currentThemeIdx].toUpperCase()}</strong></span>`);
-            playKeySound('enter');
+        function minimizeWindow(winId) {
+            const win = document.getElementById(winId);
+            if (!win) return;
+            win.classList.add('minimized');
+            updateTaskbar();
         }
 
-        // Portfolio Information Matrix
-        const portfolioData = {
-            name: "Jaydeep Shirsath",
-            role: "Cybersecurity Specialist & Penetration Testing Enthusiast",
-            location: "Pune, Maharashtra, India",
-            email: "jaydeepshirsath13@gmail.com",
-            phone: "+91 9270479845",
-            education: "Bachelor of Computer Applications (BCA) - Cybersecurity Specialization",
-            university: "Ajeenkya DY Patil University (ADYPU), Pune",
-            gradYear: "Expected 2028 (Currently 2nd Year)",
-            links: {
-                github: "https://github.com/Jaydeep-Shirsath",
-                tryhackme: "https://tryhackme.com/p/Jaydeep.Shirsath",
-                htb: "https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url",
-                linkedin: "https://www.linkedin.com/in/jaydeep-shirsath-82452a380?utm_source=share_via&utm_content=profile&utm_medium=member_android",
-                credly: "https://www.credly.com/users/jaydeep-shirsath",
-                youtube: "https://youtube.com/@js44?si=4xPaJYq3JOWW5VBK"
-            }
-        };
-
-        const bootLogs = [
-            "[  0.000000] Linux version 6.8.0-parrot-sec (jaydeep@kernel-forge) #1 SMP PREEMPT",
-            "[  0.012431] BIOS-provided physical RAM map: 32768MB active verified",
-            "[  0.043120] CPU0: AMD Ryzen Virtual Security Node detected",
-            "[  0.089421] ACPI: Core System Power Resources Initialized",
-            "[  0.134982] Cryptographic API: AES-NI, SHA-512, Blowfish accelerated",
-            "[  0.198341] Loading module: [modprobe] iptables_firewall ... OK",
-            "[  0.254129] Loading module: [modprobe] nmap_service_scanner ... OK",
-            "[  0.312984] Loading module: [modprobe] ghidra_disassembly_engine ... OK",
-            "[  0.378901] Loading module: [modprobe] john_cracking_suite ... OK",
-            "[  0.421940] Loading module: [modprobe] hydra_network_bruteforce ... OK",
-            "[  0.490123] Mounting isolated sandbox: /dev/virtualbox /dev/vmware ... MOUNTED",
-            "[  0.543210] Bypassing security boundaries with simulated low-level hooks...",
-            "[  0.612049] Enforcing Unix file rights: chmod 700 /root; chown root:wheel ... SECURED",
-            "[  0.689320] Loading Cloud IAM Token Validator: Google Cloud Arcade credential verified.",
-            "[  0.741029] Negotiating reverse shell listener on port 4444 ... LISTENING",
-            "[  0.812390] Spawning interactive TTY session: /bin/bash (tty1)",
-            "[  0.903412] Handshake accepted: guest_session authorized.",
-            "[  1.000000] System Ready. Launching Jaydeep Shirsath's Interactive Cyber Deck..."
-        ];
-
-        let bootIdx = 0;
-        let bootAborted = false;
-        const bootScreen = document.getElementById('boot-screen');
-        const bootContainer = document.getElementById('boot-logs');
-
-        function stepBoot() {
-            if (bootAborted) return;
-            if (bootIdx < bootLogs.length) {
-                const line = document.createElement('div');
-                line.className = 'line';
-                if (bootLogs[bootIdx].includes('OK') || bootLogs[bootIdx].includes('Ready')) {
-                    line.className += ' txt-success';
-                } else if (bootLogs[bootIdx].includes('Bypassing')) {
-                    line.className += ' txt-warn';
-                } else {
-                    line.className += ' txt-dim';
-                }
-                line.textContent = bootLogs[bootIdx];
-                bootContainer.appendChild(line);
-                bootScreen.scrollTop = bootScreen.scrollHeight;
-                playKeySound('key');
-                bootIdx++;
-                setTimeout(stepBoot, 55 + Math.random() * 45);
-            } else {
-                setTimeout(terminateBoot, 450);
-            }
+        function maximizeWindow(winId) {
+            const win = document.getElementById(winId);
+            if (!win) return;
+            win.classList.toggle('maximized');
+            bringToFront(winId);
         }
 
-        function terminateBoot() {
-            if (bootAborted) return;
-            bootAborted = true;
-            bootScreen.style.opacity = '0';
-            bootScreen.style.transition = 'opacity 0.3s ease';
-            setTimeout(() => {
-                bootScreen.style.display = 'none';
-                initWelcome();
-            }, 300);
+        function openResumeViewer() {
+            openWindow('win-resume');
         }
 
-        // Catch Escape key to skip boot sequence
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') terminateBoot();
-            if (e.key.toLowerCase() === 't' && document.activeElement !== document.getElementById('cli-input')) {
-                cycleTheme();
-            }
+        function updateTaskbar() {
+            const container = document.getElementById('taskbar-tasks');
+            container.innerHTML = '';
+            activeWindows.forEach(id => {
+                const win = document.getElementById(id);
+                const title = win.querySelector('.win-title').innerText.trim();
+                const task = document.createElement('div');
+                task.className = 'task-item' + (!win.classList.contains('minimized') ? ' active' : '');
+                task.innerText = title;
+                task.onclick = () => {
+                    if (win.classList.contains('minimized')) {
+                        win.classList.remove('minimized');
+                        bringToFront(id);
+                    } else if (parseInt(win.style.zIndex) === highestZ) {
+                        minimizeWindow(id);
+                    } else {
+                        bringToFront(id);
+                    }
+                };
+                container.appendChild(task);
+            });
+        }
+
+        // Draggable Window Handler
+        let dragTarget = null;
+        let dragOffset = { x: 0, y: 0 };
+
+        function startDragWindow(e, winId) {
+            if (e.target.closest('.win-btn')) return; // Ignore window buttons
+            const win = document.getElementById(winId);
+            bringToFront(winId);
+            if (win.classList.contains('maximized')) return;
+
+            dragTarget = win;
+            const rect = win.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+
+            window.addEventListener('mousemove', onDragWindow);
+            window.addEventListener('mouseup', stopDragWindow);
+        }
+
+        function onDragWindow(e) {
+            if (!dragTarget) return;
+            e.preventDefault();
+            let newX = e.clientX - dragOffset.x;
+            let newY = e.clientY - dragOffset.y;
+
+            // Restrict above top bar
+            if (newY < 36) newY = 36;
+            dragTarget.style.left = `${newX}px`;
+            dragTarget.style.top = `${newY}px`;
+        }
+
+        function stopDragWindow() {
+            dragTarget = null;
+            window.removeEventListener('mousemove', onDragWindow);
+            window.removeEventListener('mouseup', stopDragWindow);
+        }
+
+        // Window Focus on Click
+        document.querySelectorAll('.os-window').forEach(win => {
+            win.addEventListener('mousedown', () => {
+                bringToFront(win.id);
+            });
         });
 
-        // Start Boot immediately
-        setTimeout(stepBoot, 100);
-
-        const historyElem = document.getElementById('history');
-        const viewport = document.getElementById('viewport');
-        const cliInput = document.getElementById('cli-input');
-
-        function appendOutput(htmlContent) {
-            const div = document.createElement('div');
-            div.className = 'line';
-            div.innerHTML = htmlContent;
-            historyElem.appendChild(div);
-            viewport.scrollTop = viewport.scrollHeight;
+        // App Menu (Start Menu)
+        function toggleAppMenu() {
+            const menu = document.getElementById('app-menu');
+            menu.classList.toggle('show');
         }
 
-        function initWelcome() {
-            const asciiBanner = `
-     ██╗ █████╗ ██╗   ██╗██████╗ ███████╗███████╗██████╗ 
-     ██║██╔══██╗╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝██╔══██╗
-     ██║███████║ ╚████╔╝ ██║  ██║█████╗  █████╗  ██████╔╝
-██   ██║██╔══██║  ╚██╔╝  ██║  ██║██╔══╝  ██╔══╝  ██╔═══╝ 
-╚█████╔╝██║  ██║   ██║   ██████╔╝███████╗███████╗██║     
- ╚════╝ ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚══════╝╚═╝     
-       SHIRSATH // CYBERSECURITY & THREAT LABS
-            `;
-
-            appendOutput(`<pre class="ascii-logo">${asciiBanner}</pre>`);
-            appendOutput(`
-                <div class="card-box">
-                    <div class="txt-bold">SYSTEM STATUS: <span class="txt-success">SECURE &amp; READY</span> | TARGET: <span class="txt-accent">CYBERSECURITY INTERNSHIPS</span></div>
-                    <div style="margin-top: 4px;">Welcome visitor! You are accessing the interactive portfolio terminal of <strong>${portfolioData.name}</strong>.</div>
-                    <div class="txt-dim" style="margin-top: 3px;">• Undergrad BCA Cybersecurity Specialist at ADYPU Pune (Grad 2028).</div>
-                    <div class="txt-dim">• Offensive Security, Reverse Engineering, Forensics, and System Hardening.</div>
-                </div>
-                <div class="line txt-accent">💡 <strong>Quick Navigation:</strong> Type commands below (e.g. <span class="txt-white">about</span>, <span class="txt-white">skills</span>, <span class="txt-white">projects</span>) or <strong>click/tap the chips above</strong>.</div>
-            `);
-            playKeySound('beep');
-            cliInput.focus();
+        function filterMenuCategory(cat, elem) {
+            document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+            elem.classList.add('active');
+            const items = document.querySelectorAll('.menu-app-item');
+            items.forEach(item => {
+                if (cat === 'all' || item.getAttribute('data-category') === cat) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
         }
 
-        // Complete Command Registry
-        const commands = {
-            help: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">AVAILABLE TERMINAL COMMANDS:</div>
-    <br>
-    <div><span class="txt-bold">about</span>          - Personal background, university, and cybersecurity mission</div>
-    <div><span class="txt-bold">skills</span>         - Technical attack tools, reverse engineering &amp; languages</div>
-    <div><span class="txt-bold">projects</span>       - CTF exploits, file uploads, reverse shells &amp; forensic tools</div>
-    <div><span class="txt-bold">privesc</span>        - Linux &amp; Windows local privilege escalation tradecraft</div>
-    <div><span class="txt-bold">mentorship</span>     - Peer/Faculty troubleshooting &amp; MindMesh club leadership</div>
-    <div><span class="txt-bold">platforms</span>      - TryHackMe, Hack The Box, GitHub &amp; Credly links</div>
-    <div><span class="txt-bold">certs</span>          - Google Cloud Arcade, credentials, and achievements</div>
-    <div><span class="txt-bold">contact</span>        - Email, phone number, and location channels</div>
-    <div><span class="txt-bold">socials</span>        - LinkedIn, YouTube channel, and GitHub</div>
-    <div><span class="txt-bold">whoami</span>         - Display current session authorization level</div>
-    <div><span class="txt-bold">theme</span>          - Cycle interface theme (Matrix Green, Amber, Cyber, Blood)</div>
-    <div><span class="txt-bold">cat flag.txt</span>   - Read protected Capture-The-Flag secret</div>
-    <div><span class="txt-bold">resume</span>         - Direct quick-view and download access for formal CV</div>
-    <div><span class="txt-bold">sudo</span>           - Attempt superuser escalation</div>
-    <div><span class="txt-bold">all</span>            - Unroll full portfolio dossier sequentially</div>
-    <div><span class="txt-bold">clear</span>          - Purge the current terminal screen buffer</div>
-</div>`,
+        // Context Menu Handler
+        function openContextMenu(e) {
+            e.preventDefault();
+            const cm = document.getElementById('context-menu');
+            cm.style.display = 'block';
+            cm.style.left = `${e.clientX}px`;
+            cm.style.top = `${e.clientY}px`;
+        }
 
-            about: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[IDENTIFICATION // DOSSIER]</div>
-    <br>
-    <div><strong>Name:</strong> ${portfolioData.name}</div>
-    <div><strong>Role:</strong> ${portfolioData.role}</div>
-    <div><strong>Education:</strong> ${portfolioData.education}</div>
-    <div><strong>Institution:</strong> ${portfolioData.university}</div>
-    <div><strong>Timeline:</strong> ${portfolioData.gradYear}</div>
-    <div><strong>Base:</strong> ${portfolioData.location}</div>
-    <br>
-    <div style="line-height: 1.6;">
-        I am an undergraduate cybersecurity practitioner passionate about adversarial emulation, binary decompilation, and robust system defense. Through hands-on platforms (TryHackMe, Hack The Box) and real-world system experiments, I explore vulnerability lifecycles: from unrestricted file upload bypasses and interactive reverse shells to local privilege escalation on Linux and Windows. Beyond testing, I actively support university students and faculty members with tool setups, lab environments, and diagnostic troubleshooting.
-    </div>
-</div>`,
+        function closeAllPopups(e) {
+            const cm = document.getElementById('context-menu');
+            if (cm) cm.style.display = 'none';
+            const menu = document.getElementById('app-menu');
+            if (menu && !e.target.closest('#app-menu') && !e.target.closest('.app-menu-btn')) {
+                menu.classList.remove('show');
+            }
+        }
 
-            skills: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[TECHNICAL CAPABILITIES &amp; WEAPONRY]</div>
-    <br>
-    <div><strong class="txt-white">Offensive Security:</strong>
-        <span class="badge-tag">File Upload Exploitation</span>
-        <span class="badge-tag">Web Shell Delivery</span>
-        <span class="badge-tag">Reverse Shell Spawning</span>
-        <span class="badge-tag">TTY Stabilization</span>
-        <span class="badge-tag">THC-Hydra</span>
-        <span class="badge-tag">John the Ripper</span>
-        <span class="badge-tag">Burp Suite</span>
-    </div>
-    <div style="margin-top: 6px;"><strong class="txt-white">Privilege Escalation:</strong>
-        <span class="badge-tag">Linux SUID/SGID Abuse</span>
-        <span class="badge-tag">sudoers Misconfigurations</span>
-        <span class="badge-tag">Cron Hijacking</span>
-        <span class="badge-tag">Windows Service Paths</span>
-    </div>
-    <div style="margin-top: 6px;"><strong class="txt-white">Reverse Eng &amp; Forensics:</strong>
-        <span class="badge-tag">Ghidra Decompiler</span>
-        <span class="badge-tag">readelf</span>
-        <span class="badge-tag">CyberChef Recipes</span>
-        <span class="badge-tag">Steghide</span>
-        <span class="badge-tag">ExifTool Metadata</span>
-        <span class="badge-tag">Audacity Spectrograms</span>
-    </div>
-    <div style="margin-top: 6px;"><strong class="txt-white">Recon &amp; Networking:</strong>
-        <span class="badge-tag">Nmap NSE Scripts</span>
-        <span class="badge-tag">Wireshark Traffic Analysis</span>
-        <span class="badge-tag">TCP/IP &amp; OSI Models</span>
-        <span class="badge-tag">DNS/HTTP/S Auditing</span>
-    </div>
-    <div style="margin-top: 6px;"><strong class="txt-white">Permissions, Cloud &amp; Systems:</strong>
-        <span class="badge-tag">Linux Access Controls (chmod/chown)</span>
-        <span class="badge-tag">Cloud IAM Policies</span>
-        <span class="badge-tag">Google Cloud Arcade</span>
-        <span class="badge-tag">AWS Basics (S3/EC2)</span>
-        <span class="badge-tag">VMware Workstation Pro</span>
-        <span class="badge-tag">Oracle VM VirtualBox</span>
-    </div>
-    <div style="margin-top: 6px;"><strong class="txt-white">Languages &amp; DBs:</strong>
-        <span class="badge-tag">Python (Automation/Data)</span>
-        <span class="badge-tag">C / C++ (Memory &amp; Data Structures)</span>
-        <span class="badge-tag">Bash Scripting</span>
-        <span class="badge-tag">SQL (MySQL, Postgres)</span>
-    </div>
-</div>`,
+        // Cycle Wallpaper Theme
+        let themeIndex = 0;
+        function cycleWallpaper() {
+            themeIndex = (themeIndex + 1) % 3;
+            const desktop = document.getElementById('desktop');
+            if (themeIndex === 0) {
+                desktop.style.background = 'radial-gradient(circle at 75% 20%, rgba(0, 210, 255, 0.08) 0%, transparent 45%), linear-gradient(135deg, #06090e 0%, #0c121d 60%, #070b12 100%)';
+            } else if (themeIndex === 1) {
+                desktop.style.background = 'radial-gradient(circle at 50% 50%, rgba(0, 255, 157, 0.09) 0%, transparent 60%), linear-gradient(135deg, #020c06 0%, #06170d 60%, #020c06 100%)';
+            } else {
+                desktop.style.background = 'radial-gradient(circle at 70% 80%, rgba(157, 78, 221, 0.12) 0%, transparent 50%), linear-gradient(135deg, #0d0614 0%, #170d24 60%, #0d0614 100%)';
+            }
+        }
 
-            privesc: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[LOCAL PRIVILEGE ESCALATION WORKFLOW]</div>
-    <br>
-    <div><strong class="txt-warn">Linux Targets:</strong></div>
-    <div>• SUID/SGID Bit Exploitation: Auditing binaries with permissions like <code>find / -perm -4000 2&gt;/dev/null</code>.</div>
-    <div>• Misconfigured Sudoers: Exploiting <code>sudo -l</code> binaries that break out of restricted shells via GTFOBins.</div>
-    <div>• Cron Job &amp; Wildcard Abuse: Intercepting world-writable root scripts and unquoted PATH searches.</div>
-    <div>• Credential Harvesting: Inspecting memory, history files, and config files for plain-text secrets.</div>
-    <br>
-    <div><strong class="txt-warn">Windows Targets:</strong></div>
-    <div>• Unquoted service path inspections, weak registry permissions, and token impersonation vectors.</div>
-</div>`,
+        // Browser navigation helper
+        function loadBrowserUrl(url) {
+            document.getElementById('browser-url-bar').value = url;
+            window.open(url, '_blank');
+        }
 
-            projects: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[PRACTICAL SECURITY OPERATIONS &amp; LABS]</div>
-    <br>
-    <div class="txt-bold txt-white">1. End-to-End Penetration Testing (HTB &amp; TryHackMe)</div>
-    <div class="txt-dim">• Initial Recon: Network discovery, open service enumeration, and script auditing via Nmap.</div>
-    <div class="txt-dim">• Weaponization: Bypassed file upload constraints (MIME type tampering, extension bypasses) to deploy web shells.</div>
-    <div class="txt-dim">• Foothold: Caught inbound reverse connections via Netcat and stabilized sessions into fully interactive TTY environments.</div>
-    <div class="txt-dim">• Exploitation: Used THC-Hydra for brute-force attacks and John the Ripper to crack password hashes.</div>
-    <div class="txt-dim">• Elevation: Escalated to root through SUID flaws and sudo misconfigurations.</div>
-    <br>
-    <div class="txt-bold txt-white">2. Reverse Engineering &amp; Steganography Challenges</div>
-    <div class="txt-dim">• Decompiled x86/64 binaries using Ghidra to analyze execution paths and bypass hardcoded verification logic.</div>
-    <div class="txt-dim">• Extracted hidden artifacts using Steghide and ExifTool; performed audio spectrogram analysis using Audacity.</div>
-    <div class="txt-dim">• Used CyberChef to decode multi-layered encoded payloads (Base64, Hex, XOR, URL).</div>
-    <br>
-    <div class="txt-bold txt-white">3. Isolated Virtualization Testbeds (VMware &amp; VirtualBox)</div>
-    <div class="txt-dim">• Built host-only and NAT sandboxed labs featuring Debian and Windows machines.</div>
-    <div class="txt-dim">• Configured granular Linux user permissions, secured sudoers configs, and prevented unauthorized privilege escalations.</div>
-</div>`,
+        // ------------------ Interactive Hacker CLI ------------------
+        const termInput = document.getElementById('term-cmd-input');
+        const termHistory = document.getElementById('term-history');
 
-            mentorship: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[CAMPUS LEADERSHIP, MENTORSHIP &amp; TEAMWORK]</div>
-    <br>
-    <div><strong>Role:</strong> Technical Lead &amp; Cybersecurity Lead (MindMesh Club, ADYPU)</div>
-    <br>
-    <div>• <strong class="txt-white">Peer &amp; Faculty Technical Support:</strong> Act as the primary technical troubleshooter on campus. Regularly assist students and faculty members with complex cybersecurity tool setups (Ghidra, Burp Suite, hypervisors), dependency conflicts, and Linux runtime troubleshooting.</div>
-    <div>• <strong class="txt-white">Hands-on CTF Bootcamps:</strong> Conduct workshops guiding junior students through ethical hacking workflows, command line navigation, and secure system practices.</div>
-    <div>• <strong class="txt-white">Educational Video Guides:</strong> Run technical YouTube channel (<strong>@js44</strong>) sharing walkthroughs and step-by-step security workflows.</div>
-</div>`,
-
-            platforms: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[VERIFIED SECURITY PLATFORMS]</div>
-    <br>
-    <div>• <strong>TryHackMe:</strong> <a class="hyperlink" href="${portfolioData.links.tryhackme}" target="_blank">tryhackme.com/p/Jaydeep.Shirsath</a></div>
-    <div>• <strong>Hack The Box:</strong> <a class="hyperlink" href="${portfolioData.links.htb}" target="_blank">profile.hackthebox.com/profile/019e6d7d...</a></div>
-    <div>• <strong>GitHub:</strong> <a class="hyperlink" href="${portfolioData.links.github}" target="_blank">github.com/Jaydeep-Shirsath</a></div>
-    <div>• <strong>Credly (Badges):</strong> <a class="hyperlink" href="${portfolioData.links.credly}" target="_blank">credly.com/users/jaydeep-shirsath</a></div>
-</div>`,
-
-            certs: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[ACHIEVEMENTS &amp; RECOGNITION]</div>
-    <br>
-    <div>• <strong class="txt-white">Google Cloud Arcade Facilitator Program:</strong> Completed hands-on tracks covering Cloud IAM, infrastructure security, and resource quotas. Earned official Google Cloud swags and verified badges on Credly.</div>
-    <div>• <strong class="txt-white">Technical Content Creator:</strong> Creator of <strong>@js44</strong> on YouTube, producing practical lab guides and walkthroughs for emerging practitioners.</div>
-</div>`,
-
-            contact: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[SECURE COMMUNICATIONS CHANNEL]</div>
-    <br>
-    <div>• <strong>Email:</strong> <a class="hyperlink" href="mailto:${portfolioData.email}">${portfolioData.email}</a></div>
-    <div>• <strong>Phone:</strong> <span class="txt-white">${portfolioData.phone}</span></div>
-    <div>• <strong>Location:</strong> <span class="txt-white">${portfolioData.location}</span></div>
-    <div>• <strong>LinkedIn:</strong> <a class="hyperlink" href="${portfolioData.links.linkedin}" target="_blank">linkedin.com/in/jaydeep-shirsath</a></div>
-</div>`,
-
-            socials: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[EXTERNAL FEEDS &amp; PROFILES]</div>
-    <br>
-    <div>• <strong>LinkedIn:</strong> <a class="hyperlink" href="${portfolioData.links.linkedin}" target="_blank">linkedin.com/in/jaydeep-shirsath</a></div>
-    <div>• <strong>YouTube Channel:</strong> <a class="hyperlink" href="${portfolioData.links.youtube}" target="_blank">youtube.com/@js44</a></div>
-    <div>• <strong>GitHub:</strong> <a class="hyperlink" href="${portfolioData.links.github}" target="_blank">github.com/Jaydeep-Shirsath</a></div>
-</div>`,
-
-            whoami: () => `
-<div><span class="txt-bold">UID:</span> 1001(guest) <span class="txt-bold">GID:</span> 1001(visitor) <span class="txt-bold">Groups:</span> 1001(recruiter), 2000(evaluator) | Terminal status: Authorized read-only probe.</div>`,
-
-            sudo: () => `
-<div><span class="txt-err">[-] Access denied:</span> 'guest' is not in the sudoers file. This incident will be reported to <strong>Jaydeep</strong>. 😉</div>`,
-
-            "cat flag.txt": () => `
-<div class="card-box">
-    <span class="txt-warn">[🚩 CTF FLAG CAPTURED]:</span> <span class="txt-bold" style="background:#003300; padding:2px 6px;">THM{h1r3_j4yd33p_sh1rs4th_2028}</span>
-    <div class="txt-dim" style="margin-top:4px;">Congratulations! You found the hidden portfolio flag.</div>
-</div>`,
-
-            theme: () => {
-                cycleTheme();
-                return '';
+        const cliCommands = {
+            help: `
+<span style="color:var(--accent-cyan); font-weight:bold;">AVAILABLE SHELL MODULES:</span>
+  about        - Output Jaydeep's educational &amp; professional background
+  skills       - Inspect technical offensive tools &amp; reverse engineering
+  projects     - Practical CTF labs, file upload exploits, reverse shells
+  privesc      - Linux &amp; Windows local privilege escalation methods
+  mentorship   - Leadership at MindMesh Club &amp; faculty tech support
+  platforms    - Direct profile links (THM, HTB, GitHub, Credly)
+  resume       - Open formatted resume document viewer
+  gui          - Open File Explorer or Browser window
+  whoami       - Display active session authorization
+  clear        - Flush terminal buffer
+`,
+            about: `
+<strong>[DOSSIER] // Jaydeep Shirsath</strong>
+- <strong>Degree:</strong> BCA in Cybersecurity Specialization (Graduation: Expected 2028)
+- <strong>Campus:</strong> Ajeenkya DY Patil University (ADYPU), Pune, India
+- <strong>Role:</strong> Technical Lead &amp; Cybersecurity Lead (MindMesh Club)
+- <strong>Focus:</strong> Adversarial emulation, unrestricted file uploads, Ghidra decompilation, system hardening, and Linux administration.
+`,
+            skills: `
+<strong>[OFFENSIVE &amp; TECHNICAL ARSENAL]</strong>
+• <strong>Exploitation:</strong> File Upload Vulnerability bypasses, Web Shells, Reverse Shells (TTY stabilization), THC-Hydra, John the Ripper.
+• <strong>Privilege Escalation:</strong> Linux SUID/SGID bit abuse, sudoers misconfigurations, Cron hijacking, Windows paths.
+• <strong>Reverse Eng &amp; Forensics:</strong> Ghidra, readelf, CyberChef, Steghide, ExifTool, Audacity.
+• <strong>Networking &amp; Access:</strong> Nmap NSE, Wireshark, Cloud IAM, Linux permissions (chmod/chown).
+`,
+            privesc: `
+<strong>[LOCAL PRIVILEGE ESCALATION TRADE-CRAFT]</strong>
+1. Auditing binaries with SUID bits: find / -perm -4000 2&gt;/dev/null
+2. Abusing sudoers misconfigurations via GTFOBins
+3. Inspecting world-writable root cron scripts and unquoted PATH searches
+4. Windows service path inspection &amp; token impersonation
+`,
+            mentorship: `
+<strong>[CAMPUS LEADERSHIP &amp; MENTORSHIP]</strong>
+- Act as primary technical troubleshooter on campus for peers and college faculty.
+- Guide students in setting up tools (Ghidra, Burp Suite, VirtualBox, VMware) and debugging Linux runtime errors.
+- Run hands-on CTF bootcamps and publish technical guides on YouTube (<strong>@js44</strong>).
+`,
+            platforms: `
+• <strong>Hack The Box:</strong> profile.hackthebox.com/profile/019e6d7d...
+• <strong>TryHackMe:</strong> tryhackme.com/p/Jaydeep.Shirsath
+• <strong>GitHub:</strong> github.com/Jaydeep-Shirsath
+• <strong>YouTube:</strong> youtube.com/@js44
+• <strong>LinkedIn:</strong> linkedin.com/in/jaydeep-shirsath-82452a380
+`,
+            resume: () => {
+                openResumeViewer();
+                return 'Launching Jaydeep_Shirsath_Resume.pdf in Document Viewer...';
             },
-
+            contact: `
+• Email: <a href="mailto:jaydeepshirsath13@gmail.com" style="color:var(--accent-cyan)">jaydeepshirsath13@gmail.com</a>
+• Phone: +91 9270479845
+• Location: Pune, Maharashtra, India
+`,
+            whoami: 'uid=1001(guest) gid=1001(recruiter) groups=1001(authorized_evaluator)',
             clear: () => {
-                historyElem.innerHTML = '';
+                termHistory.innerHTML = '';
                 return '';
-            },
-
-            resume: () => `
-<div class="card-box">
-    <div class="txt-bold txt-accent">[RESUME ASSET STATUS]</div>
-    <div>Jaydeep Shirsath's print-ready PDF resume is compiled and ready.</div>
-    <div style="margin-top: 6px;">Contact directly at <a class="hyperlink" href="mailto:${portfolioData.email}">${portfolioData.email}</a> for the latest PDF copy, or check out GitHub for repository notes.</div>
-</div>`,
-
-            all: () => {
-                return commands.about() + commands.skills() + commands.projects() + commands.mentorship() + commands.platforms() + commands.certs() + commands.contact();
             }
         };
 
-        // Aliases
-        commands["ls"] = () => `<div>about.txt&nbsp;&nbsp;skills.bin&nbsp;&nbsp;projects.db&nbsp;&nbsp;flag.txt&nbsp;&nbsp;platforms.cfg&nbsp;&nbsp;contact.pem</div>`;
-        commands["cat about.txt"] = commands.about;
-        commands["cat skills.bin"] = commands.skills;
-        commands["cat projects.db"] = commands.projects;
-        commands["cat platforms.cfg"] = commands.platforms;
-        commands["cat contact.pem"] = commands.contact;
-        commands["exit"] = () => `<div>[SESSION DETACH] Refresh browser window to reinitialize.</div>`;
+        termInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = termInput.value.trim();
+                termInput.value = '';
+                if (!val) return;
 
-        const cmdHistory = [];
-        let historyIdx = -1;
+                // Echo Command
+                const row = document.createElement('div');
+                row.innerHTML = `<span class="term-prompt">jaydeep@parrot-sec:~$</span> <span>${escapeHTML(val)}</span>`;
+                termHistory.appendChild(row);
 
-        function executeCommand(inputStr) {
-            initAudio();
-            const trimmed = inputStr.trim();
-            if (!trimmed) return;
+                const lower = val.toLowerCase();
+                const resultDiv = document.createElement('div');
+                resultDiv.style.marginBottom = '8px';
 
-            // Log prompt line to screen
-            appendOutput(`<div><span class="cli-prompt">guest@jaydeep-sec:~$</span> <span class="txt-white">${escapeHTML(trimmed)}</span></div>`);
+                if (cliCommands[lower]) {
+                    const output = typeof cliCommands[lower] === 'function' ? cliCommands[lower]() : cliCommands[lower];
+                    resultDiv.innerHTML = output;
+                } else if (lower === 'ls') {
+                    resultDiv.innerHTML = 'resume.pdf  reverse_eng.elf  privesc_audit.sh  bookmarks.url  captured_flags.txt';
+                } else if (lower.startsWith('cat ')) {
+                    if (lower.includes('resume')) {
+                        openResumeViewer();
+                        resultDiv.innerHTML = 'Rendering resume.pdf...';
+                    } else {
+                        resultDiv.innerHTML = `Reading ${escapeHTML(val.substring(4))}... Access Granted. Content authenticated.`;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<span style="color:var(--accent-red)">[-] Command not found: ${escapeHTML(val)}. Type 'help' for options.</span>`;
+                }
 
-            cmdHistory.unshift(trimmed);
-            historyIdx = -1;
-
-            const normalized = trimmed.toLowerCase();
-
-            playKeySound('enter');
-
-            if (commands[normalized]) {
-                const result = commands[normalized]();
-                if (result) appendOutput(result);
-            } else {
-                appendOutput(`<div class="txt-err">[-] bash: ${escapeHTML(trimmed)}: command not found. Type <span class="txt-accent" onclick="executeCommand('help')" style="cursor:pointer; text-decoration:underline;">help</span> to inspect valid operations.</div>`);
-                playKeySound('beep');
+                termHistory.appendChild(resultDiv);
+                termHistory.parentElement.scrollTop = termHistory.parentElement.scrollHeight;
             }
-
-            viewport.scrollTop = viewport.scrollHeight;
-        }
+        });
 
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, 
@@ -884,49 +1594,8 @@
             );
         }
 
-        // Input Listener
-        cliInput.addEventListener('keydown', (e) => {
-            initAudio();
-
-            if (e.key === 'Enter') {
-                const cmd = cliInput.value;
-                cliInput.value = '';
-                executeCommand(cmd);
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (cmdHistory.length > 0 && historyIdx + 1 < cmdHistory.length) {
-                    historyIdx++;
-                    cliInput.value = cmdHistory[historyIdx];
-                }
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (historyIdx > 0) {
-                    historyIdx--;
-                    cliInput.value = cmdHistory[historyIdx];
-                } else {
-                    historyIdx = -1;
-                    cliInput.value = '';
-                }
-            } else if (e.key === 'Tab') {
-                e.preventDefault();
-                const curr = cliInput.value.toLowerCase().trim();
-                const keys = Object.keys(commands);
-                const match = keys.find(k => k.startsWith(curr));
-                if (match) {
-                    cliInput.value = match;
-                    playKeySound('key');
-                }
-            } else {
-                playKeySound('key');
-            }
-        });
-
-        // Always refocus CLI input on click outside links/buttons
-        document.addEventListener('click', (e) => {
-            if (!['A', 'BUTTON', 'INPUT'].includes(e.target.tagName)) {
-                cliInput.focus();
-            }
-        });
+        // Initialize Taskbar on Load
+        updateTaskbar();
     </script>
 </body>
 </html>
