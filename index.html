@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jaydeep Shirsath | Cyber Security Terminal OS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --term-bg: #030a05;
+            --term-fg: #00ff66;
+            --term-glow: rgba(0, 255, 102, 0.35);
+            --term-dim: #008f39;
+            --term-accent: #00e5ff;
+            --term-warn: #ffb703;
+            --term-err: #ff3344;
+            --term-white: #e2e8f0;
+            --term-border: rgba(0, 255, 102, 0.2);
+            --crt-scanline: rgba(0, 0, 0, 0.28);
+        }
+
+        body[data-theme="amber"] {
+            --term-bg: #0c0800;
+            --term-fg: #ffb000;
+            --term-glow: rgba(255, 176, 0, 0.35);
+            --term-dim: #b37400;
+            --term-accent: #ffd166;
+            --term-warn: #ff8800;
+            --term-err: #ff3b30;
+            --term-white: #fef08a;
+            --term-border: rgba(255, 176, 0, 0.25);
+        }
+
+        body[data-theme="cyber"] {
+            --term-bg: #020b14;
+            --term-fg: #00f0ff;
+            --term-glow: rgba(0, 240, 255, 0.4);
+            --term-dim: #0284c7;
+            --term-accent: #e040fb;
+            --term-warn: #f59e0b;
+            --term-err: #ff2a6d;
+            --term-white: #f8fafc;
+            --term-border: rgba(0, 240, 255, 0.25);
+        }
+
+        body[data-theme="blood"] {
+            --term-bg: #0c0204;
+            --term-fg: #ff2a4b;
+            --term-glow: rgba(255, 42, 75, 0.4);
+            --term-dim: #991b1b;
+            --term-accent: #fb7185;
+            --term-warn: #fb923c;
+            --term-err: #f43f5e;
+            --term-white: #ffe4e6;
+            --term-border: rgba(255, 42, 75, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fira Code', 'Courier New', Courier, monospace;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: var(--term-bg);
+            color: var(--term-fg);
+            overflow: hidden;
+            font-size: 13.5px;
+            text-shadow: 0 0 4px var(--term-glow);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* CRT Screen Scanlines & Vignette Overlay */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, var(--crt-scanline) 50%),
+                        radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.65) 100%);
+            background-size: 100% 3px, 100% 100%;
+        }
+
+        .crt-flicker {
+            animation: flicker 0.15s infinite;
+            opacity: 0.015;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: white;
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.012; }
+            50% { opacity: 0.024; }
+            100% { opacity: 0.015; }
+        }
+
+        /* Shell Container */
+        .terminal-window {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            padding: 8px 12px 14px 12px;
+            box-sizing: border-box;
+        }
+
+        /* Top Bar */
+        .terminal-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--term-border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: var(--term-accent);
+            user-select: none;
+        }
+
+        .terminal-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 5px;
+        }
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .terminal-bar-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .top-btn {
+            background: transparent;
+            border: 1px solid var(--term-border);
+            color: var(--term-fg);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .top-btn:hover {
+            background: var(--term-fg);
+            color: var(--term-bg);
+            box-shadow: 0 0 8px var(--term-fg);
+        }
+
+        /* Output Viewport */
+        .terminal-viewport {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 6px;
+            scroll-behavior: smooth;
+        }
+
+        .terminal-viewport::-webkit-scrollbar {
+            width: 6px;
+        }
+        .terminal-viewport::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        .terminal-viewport::-webkit-scrollbar-thumb {
+            background: var(--term-dim);
+            border-radius: 3px;
+        }
+
+        /* Text and Output Styles */
+        .line {
+            margin-bottom: 4px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .ascii-logo {
+            font-size: 10.5px;
+            line-height: 1.15;
+            color: var(--term-fg);
+            font-weight: 700;
+            white-space: pre;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .ascii-logo {
+                font-size: 6px;
+                letter-spacing: -0.5px;
+            }
+            body {
+                font-size: 12px;
+            }
+        }
+
+        .txt-dim { color: var(--term-dim); }
+        .txt-accent { color: var(--term-accent); }
+        .txt-warn { color: var(--term-warn); }
+        .txt-err { color: var(--term-err); font-weight: 600; }
+        .txt-bold { font-weight: 700; color: var(--term-white); }
+        .txt-success { color: var(--term-fg); font-weight: 600; }
+
+        .badge-tag {
+            display: inline-block;
+            background: rgba(0, 255, 102, 0.12);
+            border: 1px solid var(--term-border);
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin: 2px 3px 2px 0;
+            color: var(--term-white);
+            font-size: 11.5px;
+        }
+
+        .card-box {
+            border: 1px dashed var(--term-border);
+            padding: 10px 14px;
+            margin: 8px 0;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .hyperlink {
+            color: var(--term-accent);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            cursor: pointer;
+        }
+        .hyperlink:hover {
+            color: var(--term-white);
+            background: var(--term-dim);
+            text-decoration: none;
+            padding: 0 2px;
+        }
+
+        /* Quick Action Command Chips */
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0 14px 0;
+            padding: 8px;
+            border: 1px solid var(--term-border);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .chip-label {
+            width: 100%;
+            font-size: 11px;
+            color: var(--term-accent);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chip-btn {
+            background: rgba(0, 255, 102, 0.08);
+            border: 1px solid var(--term-border);
+            color: var(--term-fg);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11.5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.18s ease;
+        }
+        .chip-btn:hover, .chip-btn:active {
+            background: var(--term-fg);
+            color: var(--term-bg);
+            box-shadow: 0 0 10px var(--term-glow);
+            transform: translateY(-1px);
+        }
+
+        /* CLI Input Row */
+        .cli-row {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+            padding: 4px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cli-prompt {
+            color: var(--term-accent);
+            font-weight: 600;
+            white-space: nowrap;
+            margin-right: 8px;
+            user-select: none;
+        }
+
+        .cli-input-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .cli-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--term-white);
+            font-size: 14px;
+            caret-color: var(--term-fg);
+        }
+
+        /* Boot Screen Layer */
+        #boot-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: var(--term-bg);
+            z-index: 999;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .boot-logs {
+            flex: 1;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .boot-bottom-bar {
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--term-border);
+        }
+
+        .skip-btn {
+            background: transparent;
+            border: 1px solid var(--term-fg);
+            color: var(--term-fg);
+            padding: 6px 14px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--term-glow);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body data-theme="green">
+    <div class="crt-overlay"></div>
+    <div class="crt-flicker"></div>
+
+    <!-- BOOTING SEQUENCE OVERLAY -->
+    <div id="boot-screen">
+        <div class="boot-logs" id="boot-logs"></div>
+        <div class="boot-bottom-bar">
+            <span class="txt-dim">[SYSTEM BOOT SEQUENCE ENGAGED]</span>
+            <button class="skip-btn" id="skip-boot-btn" onclick="terminateBoot()">SKIP BOOT [ESC / CLICK]</button>
+        </div>
+    </div>
+
+    <!-- MAIN TERMINAL APP -->
+    <div class="terminal-window">
+        <div class="terminal-bar">
+            <div class="terminal-bar-left">
+                <div class="terminal-dots">
+                    <span class="dot dot-red"></span>
+                    <span class="dot dot-yellow"></span>
+                    <span class="dot dot-green"></span>
+                </div>
+                <span><strong>jaydeep@parrot-sec</strong>: ~/portfolio</span>
+            </div>
+            <div class="terminal-bar-controls">
+                <span id="audio-toggle" class="top-btn" onclick="toggleAudio()">AUDIO: OFF [CLICK]</span>
+                <span class="top-btn" onclick="cycleTheme()">THEME [T]</span>
+                <span class="top-btn" onclick="executeCommand('clear')">CLEAR</span>
+            </div>
+        </div>
+
+        <div class="terminal-viewport" id="viewport">
+            <div id="history"></div>
+            
+            <!-- GUIDED QUICK-ACTION CHIPS FOR VISITORS -->
+            <div class="chip-container" id="quick-chips">
+                <div class="chip-label">Interactive Guidance: Tap any module below to investigate</div>
+                <button class="chip-btn" onclick="executeCommand('about')">❯ about</button>
+                <button class="chip-btn" onclick="executeCommand('skills')">❯ skills</button>
+                <button class="chip-btn" onclick="executeCommand('projects')">❯ projects</button>
+                <button class="chip-btn" onclick="executeCommand('privesc')">❯ privesc</button>
+                <button class="chip-btn" onclick="executeCommand('platforms')">❯ platforms</button>
+                <button class="chip-btn" onclick="executeCommand('mentorship')">❯ mentorship</button>
+                <button class="chip-btn" onclick="executeCommand('certs')">❯ certs</button>
+                <button class="chip-btn" onclick="executeCommand('contact')">❯ contact</button>
+                <button class="chip-btn" onclick="executeCommand('whoami')">❯ whoami</button>
+                <button class="chip-btn" onclick="executeCommand('cat flag.txt')">❯ cat flag.txt</button>
+                <button class="chip-btn" onclick="executeCommand('help')">❯ help</button>
+            </div>
+        </div>
+
+        <!-- COMMAND PROMPT ROW -->
+        <div class="cli-row">
+            <span class="cli-prompt">guest@jaydeep-sec:~$</span>
+            <div class="cli-input-wrapper">
+                <input type="text" id="cli-input" class="cli-input" autofocus autocomplete="off" spellcheck="false" placeholder="type 'help' or click any button above...">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Web Audio API Synthetic Retro Sound Engine
+        let audioContext = null;
+        let audioMuted = true;
+
+        function initAudio() {
+            if (!audioContext) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) audioContext = new AudioCtx();
+            }
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        function playKeySound(type = 'key') {
+            if (audioMuted || !audioContext) return;
+            try {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+
+                const now = audioContext.currentTime;
+                if (type === 'beep') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(880, now);
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'enter') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, now);
+                    gain.gain.setValueAtTime(0.07, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else {
+                    // Click sound
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(550 + Math.random() * 200, now);
+                    gain.gain.setValueAtTime(0.025, now);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+                    osc.start(now);
+                    osc.stop(now + 0.035);
+                }
+            } catch (e) {
+                // Ignore audio failure
+            }
+        }
+
+        function toggleAudio() {
+            initAudio();
+            audioMuted = !audioMuted;
+            document.getElementById('audio-toggle').innerText = audioMuted ? 'AUDIO: OFF [CLICK]' : 'AUDIO: ON [BEEP]';
+            if (!audioMuted) playKeySound('beep');
+        }
+
+        // Theme Manager
+        const themes = ['green', 'amber', 'cyber', 'blood'];
+        let currentThemeIdx = 0;
+        function cycleTheme() {
+            currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+            document.body.setAttribute('data-theme', themes[currentThemeIdx]);
+            appendOutput(`<span class="txt-accent">[SYSTEM] Switched color profile to: <strong>${themes[currentThemeIdx].toUpperCase()}</strong></span>`);
+            playKeySound('enter');
+        }
+
+        // Portfolio Information Matrix
+        const portfolioData = {
+            name: "Jaydeep Shirsath",
+            role: "Cybersecurity Specialist & Penetration Testing Enthusiast",
+            location: "Pune, Maharashtra, India",
+            email: "jaydeepshirsath13@gmail.com",
+            phone: "+91 9270479845",
+            education: "Bachelor of Computer Applications (BCA) - Cybersecurity Specialization",
+            university: "Ajeenkya DY Patil University (ADYPU), Pune",
+            gradYear: "Expected 2028 (Currently 2nd Year)",
+            links: {
+                github: "https://github.com/Jaydeep-Shirsath",
+                tryhackme: "https://tryhackme.com/p/Jaydeep.Shirsath",
+                htb: "https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url",
+                linkedin: "https://www.linkedin.com/in/jaydeep-shirsath-82452a380?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+                credly: "https://www.credly.com/users/jaydeep-shirsath",
+                youtube: "https://youtube.com/@js44?si=4xPaJYq3JOWW5VBK"
+            }
+        };
+
+        const bootLogs = [
+            "[  0.000000] Linux version 6.8.0-parrot-sec (jaydeep@kernel-forge) #1 SMP PREEMPT",
+            "[  0.012431] BIOS-provided physical RAM map: 32768MB active verified",
+            "[  0.043120] CPU0: AMD Ryzen Virtual Security Node detected",
+            "[  0.089421] ACPI: Core System Power Resources Initialized",
+            "[  0.134982] Cryptographic API: AES-NI, SHA-512, Blowfish accelerated",
+            "[  0.198341] Loading module: [modprobe] iptables_firewall ... OK",
+            "[  0.254129] Loading module: [modprobe] nmap_service_scanner ... OK",
+            "[  0.312984] Loading module: [modprobe] ghidra_disassembly_engine ... OK",
+            "[  0.378901] Loading module: [modprobe] john_cracking_suite ... OK",
+            "[  0.421940] Loading module: [modprobe] hydra_network_bruteforce ... OK",
+            "[  0.490123] Mounting isolated sandbox: /dev/virtualbox /dev/vmware ... MOUNTED",
+            "[  0.543210] Bypassing security boundaries with simulated low-level hooks...",
+            "[  0.612049] Enforcing Unix file rights: chmod 700 /root; chown root:wheel ... SECURED",
+            "[  0.689320] Loading Cloud IAM Token Validator: Google Cloud Arcade credential verified.",
+            "[  0.741029] Negotiating reverse shell listener on port 4444 ... LISTENING",
+            "[  0.812390] Spawning interactive TTY session: /bin/bash (tty1)",
+            "[  0.903412] Handshake accepted: guest_session authorized.",
+            "[  1.000000] System Ready. Launching Jaydeep Shirsath's Interactive Cyber Deck..."
+        ];
+
+        let bootIdx = 0;
+        let bootAborted = false;
+        const bootScreen = document.getElementById('boot-screen');
+        const bootContainer = document.getElementById('boot-logs');
+
+        function stepBoot() {
+            if (bootAborted) return;
+            if (bootIdx < bootLogs.length) {
+                const line = document.createElement('div');
+                line.className = 'line';
+                if (bootLogs[bootIdx].includes('OK') || bootLogs[bootIdx].includes('Ready')) {
+                    line.className += ' txt-success';
+                } else if (bootLogs[bootIdx].includes('Bypassing')) {
+                    line.className += ' txt-warn';
+                } else {
+                    line.className += ' txt-dim';
+                }
+                line.textContent = bootLogs[bootIdx];
+                bootContainer.appendChild(line);
+                bootScreen.scrollTop = bootScreen.scrollHeight;
+                playKeySound('key');
+                bootIdx++;
+                setTimeout(stepBoot, 55 + Math.random() * 45);
+            } else {
+                setTimeout(terminateBoot, 450);
+            }
+        }
+
+        function terminateBoot() {
+            if (bootAborted) return;
+            bootAborted = true;
+            bootScreen.style.opacity = '0';
+            bootScreen.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => {
+                bootScreen.style.display = 'none';
+                initWelcome();
+            }, 300);
+        }
+
+        // Catch Escape key to skip boot sequence
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') terminateBoot();
+            if (e.key.toLowerCase() === 't' && document.activeElement !== document.getElementById('cli-input')) {
+                cycleTheme();
+            }
+        });
+
+        // Start Boot immediately
+        setTimeout(stepBoot, 100);
+
+        const historyElem = document.getElementById('history');
+        const viewport = document.getElementById('viewport');
+        const cliInput = document.getElementById('cli-input');
+
+        function appendOutput(htmlContent) {
+            const div = document.createElement('div');
+            div.className = 'line';
+            div.innerHTML = htmlContent;
+            historyElem.appendChild(div);
+            viewport.scrollTop = viewport.scrollHeight;
+        }
+
+        function initWelcome() {
+            const asciiBanner = `
+     ██╗ █████╗ ██╗   ██╗██████╗ ███████╗███████╗██████╗ 
+     ██║██╔══██╗╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝██╔══██╗
+     ██║███████║ ╚████╔╝ ██║  ██║█████╗  █████╗  ██████╔╝
+██   ██║██╔══██║  ╚██╔╝  ██║  ██║██╔══╝  ██╔══╝  ██╔═══╝ 
+╚█████╔╝██║  ██║   ██║   ██████╔╝███████╗███████╗██║     
+ ╚════╝ ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚══════╝╚══════╝╚═╝     
+       SHIRSATH // CYBERSECURITY & THREAT LABS
+            `;
+
+            appendOutput(`<pre class="ascii-logo">${asciiBanner}</pre>`);
+            appendOutput(`
+                <div class="card-box">
+                    <div class="txt-bold">SYSTEM STATUS: <span class="txt-success">SECURE &amp; READY</span> | TARGET: <span class="txt-accent">CYBERSECURITY INTERNSHIPS</span></div>
+                    <div style="margin-top: 4px;">Welcome visitor! You are accessing the interactive portfolio terminal of <strong>${portfolioData.name}</strong>.</div>
+                    <div class="txt-dim" style="margin-top: 3px;">• Undergrad BCA Cybersecurity Specialist at ADYPU Pune (Grad 2028).</div>
+                    <div class="txt-dim">• Offensive Security, Reverse Engineering, Forensics, and System Hardening.</div>
+                </div>
+                <div class="line txt-accent">💡 <strong>Quick Navigation:</strong> Type commands below (e.g. <span class="txt-white">about</span>, <span class="txt-white">skills</span>, <span class="txt-white">projects</span>) or <strong>click/tap the chips above</strong>.</div>
+            `);
+            playKeySound('beep');
+            cliInput.focus();
+        }
+
+        // Complete Command Registry
+        const commands = {
+            help: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">AVAILABLE TERMINAL COMMANDS:</div>
+    <br>
+    <div><span class="txt-bold">about</span>          - Personal background, university, and cybersecurity mission</div>
+    <div><span class="txt-bold">skills</span>         - Technical attack tools, reverse engineering &amp; languages</div>
+    <div><span class="txt-bold">projects</span>       - CTF exploits, file uploads, reverse shells &amp; forensic tools</div>
+    <div><span class="txt-bold">privesc</span>        - Linux &amp; Windows local privilege escalation tradecraft</div>
+    <div><span class="txt-bold">mentorship</span>     - Peer/Faculty troubleshooting &amp; MindMesh club leadership</div>
+    <div><span class="txt-bold">platforms</span>      - TryHackMe, Hack The Box, GitHub &amp; Credly links</div>
+    <div><span class="txt-bold">certs</span>          - Google Cloud Arcade, credentials, and achievements</div>
+    <div><span class="txt-bold">contact</span>        - Email, phone number, and location channels</div>
+    <div><span class="txt-bold">socials</span>        - LinkedIn, YouTube channel, and GitHub</div>
+    <div><span class="txt-bold">whoami</span>         - Display current session authorization level</div>
+    <div><span class="txt-bold">theme</span>          - Cycle interface theme (Matrix Green, Amber, Cyber, Blood)</div>
+    <div><span class="txt-bold">cat flag.txt</span>   - Read protected Capture-The-Flag secret</div>
+    <div><span class="txt-bold">resume</span>         - Direct quick-view and download access for formal CV</div>
+    <div><span class="txt-bold">sudo</span>           - Attempt superuser escalation</div>
+    <div><span class="txt-bold">all</span>            - Unroll full portfolio dossier sequentially</div>
+    <div><span class="txt-bold">clear</span>          - Purge the current terminal screen buffer</div>
+</div>`,
+
+            about: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[IDENTIFICATION // DOSSIER]</div>
+    <br>
+    <div><strong>Name:</strong> ${portfolioData.name}</div>
+    <div><strong>Role:</strong> ${portfolioData.role}</div>
+    <div><strong>Education:</strong> ${portfolioData.education}</div>
+    <div><strong>Institution:</strong> ${portfolioData.university}</div>
+    <div><strong>Timeline:</strong> ${portfolioData.gradYear}</div>
+    <div><strong>Base:</strong> ${portfolioData.location}</div>
+    <br>
+    <div style="line-height: 1.6;">
+        I am an undergraduate cybersecurity practitioner passionate about adversarial emulation, binary decompilation, and robust system defense. Through hands-on platforms (TryHackMe, Hack The Box) and real-world system experiments, I explore vulnerability lifecycles: from unrestricted file upload bypasses and interactive reverse shells to local privilege escalation on Linux and Windows. Beyond testing, I actively support university students and faculty members with tool setups, lab environments, and diagnostic troubleshooting.
+    </div>
+</div>`,
+
+            skills: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[TECHNICAL CAPABILITIES &amp; WEAPONRY]</div>
+    <br>
+    <div><strong class="txt-white">Offensive Security:</strong>
+        <span class="badge-tag">File Upload Exploitation</span>
+        <span class="badge-tag">Web Shell Delivery</span>
+        <span class="badge-tag">Reverse Shell Spawning</span>
+        <span class="badge-tag">TTY Stabilization</span>
+        <span class="badge-tag">THC-Hydra</span>
+        <span class="badge-tag">John the Ripper</span>
+        <span class="badge-tag">Burp Suite</span>
+    </div>
+    <div style="margin-top: 6px;"><strong class="txt-white">Privilege Escalation:</strong>
+        <span class="badge-tag">Linux SUID/SGID Abuse</span>
+        <span class="badge-tag">sudoers Misconfigurations</span>
+        <span class="badge-tag">Cron Hijacking</span>
+        <span class="badge-tag">Windows Service Paths</span>
+    </div>
+    <div style="margin-top: 6px;"><strong class="txt-white">Reverse Eng &amp; Forensics:</strong>
+        <span class="badge-tag">Ghidra Decompiler</span>
+        <span class="badge-tag">readelf</span>
+        <span class="badge-tag">CyberChef Recipes</span>
+        <span class="badge-tag">Steghide</span>
+        <span class="badge-tag">ExifTool Metadata</span>
+        <span class="badge-tag">Audacity Spectrograms</span>
+    </div>
+    <div style="margin-top: 6px;"><strong class="txt-white">Recon &amp; Networking:</strong>
+        <span class="badge-tag">Nmap NSE Scripts</span>
+        <span class="badge-tag">Wireshark Traffic Analysis</span>
+        <span class="badge-tag">TCP/IP &amp; OSI Models</span>
+        <span class="badge-tag">DNS/HTTP/S Auditing</span>
+    </div>
+    <div style="margin-top: 6px;"><strong class="txt-white">Permissions, Cloud &amp; Systems:</strong>
+        <span class="badge-tag">Linux Access Controls (chmod/chown)</span>
+        <span class="badge-tag">Cloud IAM Policies</span>
+        <span class="badge-tag">Google Cloud Arcade</span>
+        <span class="badge-tag">AWS Basics (S3/EC2)</span>
+        <span class="badge-tag">VMware Workstation Pro</span>
+        <span class="badge-tag">Oracle VM VirtualBox</span>
+    </div>
+    <div style="margin-top: 6px;"><strong class="txt-white">Languages &amp; DBs:</strong>
+        <span class="badge-tag">Python (Automation/Data)</span>
+        <span class="badge-tag">C / C++ (Memory &amp; Data Structures)</span>
+        <span class="badge-tag">Bash Scripting</span>
+        <span class="badge-tag">SQL (MySQL, Postgres)</span>
+    </div>
+</div>`,
+
+            privesc: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[LOCAL PRIVILEGE ESCALATION WORKFLOW]</div>
+    <br>
+    <div><strong class="txt-warn">Linux Targets:</strong></div>
+    <div>• SUID/SGID Bit Exploitation: Auditing binaries with permissions like <code>find / -perm -4000 2&gt;/dev/null</code>.</div>
+    <div>• Misconfigured Sudoers: Exploiting <code>sudo -l</code> binaries that break out of restricted shells via GTFOBins.</div>
+    <div>• Cron Job &amp; Wildcard Abuse: Intercepting world-writable root scripts and unquoted PATH searches.</div>
+    <div>• Credential Harvesting: Inspecting memory, history files, and config files for plain-text secrets.</div>
+    <br>
+    <div><strong class="txt-warn">Windows Targets:</strong></div>
+    <div>• Unquoted service path inspections, weak registry permissions, and token impersonation vectors.</div>
+</div>`,
+
+            projects: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[PRACTICAL SECURITY OPERATIONS &amp; LABS]</div>
+    <br>
+    <div class="txt-bold txt-white">1. End-to-End Penetration Testing (HTB &amp; TryHackMe)</div>
+    <div class="txt-dim">• Initial Recon: Network discovery, open service enumeration, and script auditing via Nmap.</div>
+    <div class="txt-dim">• Weaponization: Bypassed file upload constraints (MIME type tampering, extension bypasses) to deploy web shells.</div>
+    <div class="txt-dim">• Foothold: Caught inbound reverse connections via Netcat and stabilized sessions into fully interactive TTY environments.</div>
+    <div class="txt-dim">• Exploitation: Used THC-Hydra for brute-force attacks and John the Ripper to crack password hashes.</div>
+    <div class="txt-dim">• Elevation: Escalated to root through SUID flaws and sudo misconfigurations.</div>
+    <br>
+    <div class="txt-bold txt-white">2. Reverse Engineering &amp; Steganography Challenges</div>
+    <div class="txt-dim">• Decompiled x86/64 binaries using Ghidra to analyze execution paths and bypass hardcoded verification logic.</div>
+    <div class="txt-dim">• Extracted hidden artifacts using Steghide and ExifTool; performed audio spectrogram analysis using Audacity.</div>
+    <div class="txt-dim">• Used CyberChef to decode multi-layered encoded payloads (Base64, Hex, XOR, URL).</div>
+    <br>
+    <div class="txt-bold txt-white">3. Isolated Virtualization Testbeds (VMware &amp; VirtualBox)</div>
+    <div class="txt-dim">• Built host-only and NAT sandboxed labs featuring Debian and Windows machines.</div>
+    <div class="txt-dim">• Configured granular Linux user permissions, secured sudoers configs, and prevented unauthorized privilege escalations.</div>
+</div>`,
+
+            mentorship: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[CAMPUS LEADERSHIP, MENTORSHIP &amp; TEAMWORK]</div>
+    <br>
+    <div><strong>Role:</strong> Technical Lead &amp; Cybersecurity Lead (MindMesh Club, ADYPU)</div>
+    <br>
+    <div>• <strong class="txt-white">Peer &amp; Faculty Technical Support:</strong> Act as the primary technical troubleshooter on campus. Regularly assist students and faculty members with complex cybersecurity tool setups (Ghidra, Burp Suite, hypervisors), dependency conflicts, and Linux runtime troubleshooting.</div>
+    <div>• <strong class="txt-white">Hands-on CTF Bootcamps:</strong> Conduct workshops guiding junior students through ethical hacking workflows, command line navigation, and secure system practices.</div>
+    <div>• <strong class="txt-white">Educational Video Guides:</strong> Run technical YouTube channel (<strong>@js44</strong>) sharing walkthroughs and step-by-step security workflows.</div>
+</div>`,
+
+            platforms: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[VERIFIED SECURITY PLATFORMS]</div>
+    <br>
+    <div>• <strong>TryHackMe:</strong> <a class="hyperlink" href="${portfolioData.links.tryhackme}" target="_blank">tryhackme.com/p/Jaydeep.Shirsath</a></div>
+    <div>• <strong>Hack The Box:</strong> <a class="hyperlink" href="${portfolioData.links.htb}" target="_blank">profile.hackthebox.com/profile/019e6d7d...</a></div>
+    <div>• <strong>GitHub:</strong> <a class="hyperlink" href="${portfolioData.links.github}" target="_blank">github.com/Jaydeep-Shirsath</a></div>
+    <div>• <strong>Credly (Badges):</strong> <a class="hyperlink" href="${portfolioData.links.credly}" target="_blank">credly.com/users/jaydeep-shirsath</a></div>
+</div>`,
+
+            certs: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[ACHIEVEMENTS &amp; RECOGNITION]</div>
+    <br>
+    <div>• <strong class="txt-white">Google Cloud Arcade Facilitator Program:</strong> Completed hands-on tracks covering Cloud IAM, infrastructure security, and resource quotas. Earned official Google Cloud swags and verified badges on Credly.</div>
+    <div>• <strong class="txt-white">Technical Content Creator:</strong> Creator of <strong>@js44</strong> on YouTube, producing practical lab guides and walkthroughs for emerging practitioners.</div>
+</div>`,
+
+            contact: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[SECURE COMMUNICATIONS CHANNEL]</div>
+    <br>
+    <div>• <strong>Email:</strong> <a class="hyperlink" href="mailto:${portfolioData.email}">${portfolioData.email}</a></div>
+    <div>• <strong>Phone:</strong> <span class="txt-white">${portfolioData.phone}</span></div>
+    <div>• <strong>Location:</strong> <span class="txt-white">${portfolioData.location}</span></div>
+    <div>• <strong>LinkedIn:</strong> <a class="hyperlink" href="${portfolioData.links.linkedin}" target="_blank">linkedin.com/in/jaydeep-shirsath</a></div>
+</div>`,
+
+            socials: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[EXTERNAL FEEDS &amp; PROFILES]</div>
+    <br>
+    <div>• <strong>LinkedIn:</strong> <a class="hyperlink" href="${portfolioData.links.linkedin}" target="_blank">linkedin.com/in/jaydeep-shirsath</a></div>
+    <div>• <strong>YouTube Channel:</strong> <a class="hyperlink" href="${portfolioData.links.youtube}" target="_blank">youtube.com/@js44</a></div>
+    <div>• <strong>GitHub:</strong> <a class="hyperlink" href="${portfolioData.links.github}" target="_blank">github.com/Jaydeep-Shirsath</a></div>
+</div>`,
+
+            whoami: () => `
+<div><span class="txt-bold">UID:</span> 1001(guest) <span class="txt-bold">GID:</span> 1001(visitor) <span class="txt-bold">Groups:</span> 1001(recruiter), 2000(evaluator) | Terminal status: Authorized read-only probe.</div>`,
+
+            sudo: () => `
+<div><span class="txt-err">[-] Access denied:</span> 'guest' is not in the sudoers file. This incident will be reported to <strong>Jaydeep</strong>. 😉</div>`,
+
+            "cat flag.txt": () => `
+<div class="card-box">
+    <span class="txt-warn">[🚩 CTF FLAG CAPTURED]:</span> <span class="txt-bold" style="background:#003300; padding:2px 6px;">THM{h1r3_j4yd33p_sh1rs4th_2028}</span>
+    <div class="txt-dim" style="margin-top:4px;">Congratulations! You found the hidden portfolio flag.</div>
+</div>`,
+
+            theme: () => {
+                cycleTheme();
+                return '';
+            },
+
+            clear: () => {
+                historyElem.innerHTML = '';
+                return '';
+            },
+
+            resume: () => `
+<div class="card-box">
+    <div class="txt-bold txt-accent">[RESUME ASSET STATUS]</div>
+    <div>Jaydeep Shirsath's print-ready PDF resume is compiled and ready.</div>
+    <div style="margin-top: 6px;">Contact directly at <a class="hyperlink" href="mailto:${portfolioData.email}">${portfolioData.email}</a> for the latest PDF copy, or check out GitHub for repository notes.</div>
+</div>`,
+
+            all: () => {
+                return commands.about() + commands.skills() + commands.projects() + commands.mentorship() + commands.platforms() + commands.certs() + commands.contact();
+            }
+        };
+
+        // Aliases
+        commands["ls"] = () => `<div>about.txt&nbsp;&nbsp;skills.bin&nbsp;&nbsp;projects.db&nbsp;&nbsp;flag.txt&nbsp;&nbsp;platforms.cfg&nbsp;&nbsp;contact.pem</div>`;
+        commands["cat about.txt"] = commands.about;
+        commands["cat skills.bin"] = commands.skills;
+        commands["cat projects.db"] = commands.projects;
+        commands["cat platforms.cfg"] = commands.platforms;
+        commands["cat contact.pem"] = commands.contact;
+        commands["exit"] = () => `<div>[SESSION DETACH] Refresh browser window to reinitialize.</div>`;
+
+        const cmdHistory = [];
+        let historyIdx = -1;
+
+        function executeCommand(inputStr) {
+            initAudio();
+            const trimmed = inputStr.trim();
+            if (!trimmed) return;
+
+            // Log prompt line to screen
+            appendOutput(`<div><span class="cli-prompt">guest@jaydeep-sec:~$</span> <span class="txt-white">${escapeHTML(trimmed)}</span></div>`);
+
+            cmdHistory.unshift(trimmed);
+            historyIdx = -1;
+
+            const normalized = trimmed.toLowerCase();
+
+            playKeySound('enter');
+
+            if (commands[normalized]) {
+                const result = commands[normalized]();
+                if (result) appendOutput(result);
+            } else {
+                appendOutput(`<div class="txt-err">[-] bash: ${escapeHTML(trimmed)}: command not found. Type <span class="txt-accent" onclick="executeCommand('help')" style="cursor:pointer; text-decoration:underline;">help</span> to inspect valid operations.</div>`);
+                playKeySound('beep');
+            }
+
+            viewport.scrollTop = viewport.scrollHeight;
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // Input Listener
+        cliInput.addEventListener('keydown', (e) => {
+            initAudio();
+
+            if (e.key === 'Enter') {
+                const cmd = cliInput.value;
+                cliInput.value = '';
+                executeCommand(cmd);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (cmdHistory.length > 0 && historyIdx + 1 < cmdHistory.length) {
+                    historyIdx++;
+                    cliInput.value = cmdHistory[historyIdx];
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIdx > 0) {
+                    historyIdx--;
+                    cliInput.value = cmdHistory[historyIdx];
+                } else {
+                    historyIdx = -1;
+                    cliInput.value = '';
+                }
+            } else if (e.key === 'Tab') {
+                e.preventDefault();
+                const curr = cliInput.value.toLowerCase().trim();
+                const keys = Object.keys(commands);
+                const match = keys.find(k => k.startsWith(curr));
+                if (match) {
+                    cliInput.value = match;
+                    playKeySound('key');
+                }
+            } else {
+                playKeySound('key');
+            }
+        });
+
+        // Always refocus CLI input on click outside links/buttons
+        document.addEventListener('click', (e) => {
+            if (!['A', 'BUTTON', 'INPUT'].includes(e.target.tagName)) {
+                cliInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
