@@ -33,12 +33,60 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: var(--bg-base);
+            background-color: #000;
             color: var(--text-main);
             font-family: var(--font-sans);
             font-size: 13px;
         }
 
+        /* Fullscreen Boot Sequence Screen */
+        #bootScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #020406;
+            color: #00ff66;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 30px;
+            z-index: 999999;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .boot-line {
+            margin-bottom: 5px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .boot-ok { color: #00ff66; font-weight: bold; }
+        .boot-warn { color: var(--neon-amber); }
+        .boot-info { color: var(--neon-cyan); }
+
+        .skip-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 229, 255, 0.15);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000000;
+            transition: all 0.2s;
+        }
+        .skip-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+        }
+
+        /* Matrix / Cyber Grid Canvas */
         #matrixCanvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -54,7 +102,7 @@
             background-size: 100% 3px;
             z-index: 99998;
             pointer-events: none;
-            opacity: 0.3;
+            opacity: 0.28;
         }
 
         #desktop {
@@ -69,6 +117,8 @@
             grid-auto-flow: column;
             gap: 12px;
             align-content: start;
+            opacity: 0;
+            transition: opacity 0.8s ease-in;
         }
 
         .desktop-icon {
@@ -108,6 +158,7 @@
             word-break: break-word;
         }
 
+        /* Window Styling */
         .window {
             position: absolute;
             background: var(--bg-surface);
@@ -118,8 +169,8 @@
             flex-direction: column;
             overflow: hidden;
             z-index: 10;
-            min-width: 320px;
-            min-height: 220px;
+            min-width: 340px;
+            min-height: 240px;
         }
 
         .window.active {
@@ -149,10 +200,7 @@
             font-weight: 600;
         }
 
-        .window-title svg {
-            width: 16px;
-            height: 16px;
-        }
+        .window-title svg { width: 16px; height: 16px; }
 
         .window-controls {
             display: flex;
@@ -173,9 +221,9 @@
         .win-min { background: var(--neon-amber); }
         .win-max { background: var(--neon-green); }
 
-        /* Real WebApp Browser Toolbar */
+        /* Integrated WebApp Browser Toolbar */
         .browser-toolbar {
-            height: 40px;
+            height: 42px;
             background: #090f17;
             border-bottom: 1px solid var(--border-dim);
             display: flex;
@@ -189,10 +237,11 @@
             border: none;
             color: var(--text-dim);
             cursor: pointer;
-            padding: 4px;
+            padding: 5px;
             border-radius: 4px;
             display: flex;
             align-items: center;
+            font-size: 12px;
         }
         .browser-nav-btn:hover { color: var(--neon-cyan); background: rgba(0, 229, 255, 0.1); }
 
@@ -225,7 +274,7 @@
             background: rgba(0, 229, 255, 0.12);
             color: var(--neon-cyan);
             border: 1px solid rgba(0, 229, 255, 0.35);
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 14px;
             font-family: var(--font-mono);
             font-size: 11px;
@@ -235,10 +284,12 @@
             gap: 4px;
             cursor: pointer;
             white-space: nowrap;
+            transition: all 0.2s;
         }
         .browser-open-btn:hover {
             background: var(--neon-cyan);
             color: #000;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
         }
 
         .window-body {
@@ -250,6 +301,7 @@
             user-select: text;
         }
 
+        /* Taskbar */
         #taskbar {
             position: fixed;
             bottom: 0; left: 0; width: 100%;
@@ -262,6 +314,8 @@
             justify-content: space-between;
             padding: 0 10px;
             z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.8s ease-in;
         }
 
         .start-btn {
@@ -324,6 +378,7 @@
             font-size: 11px;
         }
 
+        /* Start Menu */
         #startMenu {
             position: fixed;
             bottom: calc(var(--taskbar-h) + 6px);
@@ -368,7 +423,38 @@
             padding-left: 18px;
         }
 
-        /* App-Specific Styles */
+        /* WebApp Inside Windows */
+        .webapp-view {
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            background: #070c12;
+            font-family: var(--font-sans);
+        }
+
+        .yt-embed-box {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-dim);
+        }
+        .yt-embed-box iframe {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%; border: none;
+        }
+
+        .stat-badge {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-dim);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
         .term-container {
             height: 100%;
             background: #030608;
@@ -408,41 +494,7 @@
             font-family: var(--font-mono); font-size: 11px; border: 1px solid transparent;
         }
         .fm-item:hover { background: rgba(0, 229, 255, 0.08); border-color: rgba(0, 229, 255, 0.2); }
-        .fm-item svg { width: 32px; height: 32px; margin-bottom: 6px; }
 
-        /* WebApp Inside Window Content */
-        .webapp-view {
-            padding: 20px;
-            height: 100%;
-            overflow-y: auto;
-            background: #070c12;
-            font-family: var(--font-sans);
-        }
-
-        .yt-embed-box {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 16px;
-            border: 1px solid var(--border-dim);
-        }
-        .yt-embed-box iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%; border: none;
-        }
-
-        .stat-badge {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-dim);
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        /* Printable Resume */
         @media print {
             body * { visibility: hidden; }
             #resumePaper, #resumePaper * { visibility: visible; }
@@ -454,6 +506,12 @@
     </style>
 </head>
 <body>
+
+    <!-- BOOTING SEQUENCE OVERLAY -->
+    <div id="bootScreen">
+        <button class="skip-btn" onclick="finishBoot()">SKIP BOOT [ESC]</button>
+        <div id="bootLogs"></div>
+    </div>
 
     <canvas id="matrixCanvas"></canvas>
     <div class="scanlines"></div>
@@ -479,16 +537,75 @@
             <li class="start-item" onclick="openApp('terminal'); toggleStartMenu();">Terminal Console</li>
             <li class="start-item" onclick="openApp('files'); toggleStartMenu();">File Manager</li>
             <li class="start-item" onclick="openApp('resume'); toggleStartMenu();">Resume (PDF Viewer)</li>
-            <li class="start-item" onclick="openApp('thm'); toggleStartMenu();">TryHackMe Station</li>
-            <li class="start-item" onclick="openApp('htb'); toggleStartMenu();">Hack The Box Station</li>
-            <li class="start-item" onclick="openApp('credly'); toggleStartMenu();">Credly Credentials</li>
+            <li class="start-item" onclick="openApp('thm'); toggleStartMenu();">TryHackMe WebApp</li>
+            <li class="start-item" onclick="openApp('htb'); toggleStartMenu();">Hack The Box WebApp</li>
+            <li class="start-item" onclick="openApp('credly'); toggleStartMenu();">Credly Badges WebApp</li>
             <li class="start-item" onclick="openApp('youtube'); toggleStartMenu();">YouTube App (@js44)</li>
-            <li class="start-item" onclick="openApp('linkedin'); toggleStartMenu();">LinkedIn Dossier</li>
+            <li class="start-item" onclick="openApp('linkedin'); toggleStartMenu();">LinkedIn App</li>
             <li class="start-item" onclick="openApp('trash'); toggleStartMenu();">Recycle Bin</li>
         </ul>
     </div>
 
     <script>
+        /* 1. BOOT SEQUENCE SCRIPT */
+        const bootLogs = [
+            "Initializing ZeroTrace Security BIOS v4.2.1...",
+            "Loading Linux 6.8.0-parrot-sec-amd64 kernel...",
+            "Probing CPU: AMD EPYC Virtual Core @ 3.4GHz [OK]",
+            "Checking SHA256 integrity of root partition... [VERIFIED]",
+            "[  0.104231] ACPI: Core system buses initialized",
+            "[  0.245192] PCI: Subsystem enumerating virtual ethernet (tun0)",
+            "[  0.412894] Initializing memory security layers (KASLR enabled)",
+            "[  0.621402] Mounting encrypted file system /dev/mapper/zerotrace-root...",
+            "[  0.894102] Loading Ghidra Decompiler engine modules... [OK]",
+            "[  1.021045] Starting John the Ripper and THC-Hydra background daemons... [OK]",
+            "[  1.230194] Setting up Netcat reverse shell listeners on port 4444... [OK]",
+            "[  1.450201] Launching Wayland Cyberpunk Desktop Manager...",
+            "[  1.720194] Candidate Identity Verified: JAYDEEP SHIRSATH (BCA Cybersecurity '28)",
+            "System initialization complete. Handing over control to user..."
+        ];
+
+        let bootIdx = 0;
+        const bootContainer = document.getElementById('bootLogs');
+
+        function runBootLog() {
+            if (bootIdx < bootLogs.length) {
+                const p = document.createElement('div');
+                p.className = 'boot-line';
+                let text = bootLogs[bootIdx];
+                if (text.includes('[OK]') || text.includes('[VERIFIED]')) {
+                    p.innerHTML = text.replace(/\[OK\]|\[VERIFIED\]/g, match => `<span class="boot-ok">${match}</span>`);
+                } else if (text.includes('Candidate Identity Verified')) {
+                    p.innerHTML = `<span class="boot-info">${text}</span>`;
+                } else {
+                    p.innerText = text;
+                }
+                bootContainer.appendChild(p);
+                window.scrollTo(0, document.body.scrollHeight);
+                bootIdx++;
+                setTimeout(runBootLog, 140);
+            } else {
+                setTimeout(finishBoot, 500);
+            }
+        }
+
+        function finishBoot() {
+            const bootScreen = document.getElementById('bootScreen');
+            if (bootScreen) bootScreen.style.display = 'none';
+            document.getElementById('desktop').style.opacity = '1';
+            document.getElementById('taskbar').style.opacity = '1';
+            openApp('terminal');
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') finishBoot();
+        });
+
+        window.addEventListener('load', () => {
+            runBootLog();
+        });
+
+        /* 2. AUDIO SYNTHESIZER */
         let audioCtx = null;
         let soundEnabled = true;
 
@@ -513,7 +630,7 @@
             document.getElementById('audioToggle').innerText = soundEnabled ? '🔊 FX: ON' : '🔈 FX: OFF';
         }
 
-        // Matrix background
+        /* 3. MATRIX BACKGROUND */
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -543,7 +660,7 @@
         }
         setInterval(drawMatrix, 42);
 
-        // App Definitions with Web Browser OmniBars
+        /* 4. APP DEFINITIONS WITH BROWSER ENGINE */
         const APPS = {
             terminal: {
                 id: 'terminal', title: 'root@zerotrace:~ (CLI)',
@@ -570,25 +687,25 @@
                 id: 'thm', title: 'TryHackMe App - Jaydeep.Shirsath',
                 url: 'https://tryhackme.com/p/Jaydeep.Shirsath',
                 icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>',
-                width: 700, height: 480, x: 170, y: 70, render: renderTHM
+                width: 740, height: 500, x: 170, y: 70, render: renderTHM
             },
             htb: {
-                id: 'htb', title: 'Hack The Box App',
+                id: 'htb', title: 'Hack The Box Workstation',
                 url: 'https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url',
                 icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00ff66" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/></svg>',
-                width: 700, height: 480, x: 200, y: 80, render: renderHTB
+                width: 740, height: 500, x: 200, y: 80, render: renderHTB
             },
             credly: {
                 id: 'credly', title: 'Credly Credentials App',
                 url: 'https://www.credly.com/users/jaydeep-shirsath',
                 icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffb700" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
-                width: 700, height: 470, x: 220, y: 90, render: renderCredly
+                width: 720, height: 480, x: 220, y: 90, render: renderCredly
             },
             linkedin: {
                 id: 'linkedin', title: 'LinkedIn App',
                 url: 'https://www.linkedin.com/in/jaydeep-shirsath-82452a380?utm_source=share_via&utm_content=profile&utm_medium=member_android',
                 icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>',
-                width: 700, height: 480, x: 190, y: 70, render: renderLinkedIn
+                width: 720, height: 490, x: 190, y: 70, render: renderLinkedIn
             },
             trash: {
                 id: 'trash', title: 'Recycle Bin',
@@ -612,7 +729,7 @@
             desktop.appendChild(el);
         });
 
-        // Window Manager
+        /* 5. WINDOW MANAGEMENT */
         const windows = {};
         let topZ = 20;
 
@@ -634,20 +751,19 @@
             winEl.style.top = `${Math.min(window.innerHeight - app.height - 60, Math.max(30, app.y))}px`;
             winEl.style.zIndex = ++topZ;
 
-            // Generate Browser-style Toolbar if app has URL
             let toolbarHtml = '';
             if (app.url) {
                 toolbarHtml = `
                     <div class="browser-toolbar">
-                        <button class="browser-nav-btn" onclick="alert('Browser navigation: Home')">◀</button>
-                        <button class="browser-nav-btn" onclick="alert('Forward')">▶</button>
+                        <button class="browser-nav-btn" onclick="alert('Navigating Home...')">◀</button>
+                        <button class="browser-nav-btn" onclick="alert('Navigating Forward...')">▶</button>
                         <button class="browser-nav-btn" onclick="openApp('${appId}')">⟳</button>
                         <div class="browser-omnibox">
                             <span style="color:var(--neon-green)">🔒</span>
                             <input type="text" value="${app.url}" readonly>
                         </div>
                         <a href="${app.url}" target="_blank" class="browser-open-btn">
-                            Open in Full Browser ↗
+                            Open Direct Live Page ↗
                         </a>
                     </div>
                 `;
@@ -763,7 +879,9 @@
             window.removeEventListener('mouseup', stopDrag);
         }
 
-        // 1. YouTube App (Connected to your actual video & channel)
+        /* 6. APP RENDERING FUNCTIONS */
+
+        // APP: YOUTUBE (@js44)
         function renderYouTube(container) {
             container.innerHTML = `
                 <div class="webapp-view">
@@ -780,112 +898,123 @@
                         </a>
                     </div>
 
-                    <!-- Direct Working Video from your channel (@JS44) -->
                     <div class="yt-embed-box">
                         <iframe src="https://www.youtube-nocookie.com/embed/FmJrJt0UPIk?rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
 
                     <div style="background:var(--bg-elevated); padding:14px; border-radius:6px; border:1px solid var(--border-dim); margin-top:12px;">
-                        <h4 style="color:var(--neon-cyan); margin-bottom:6px;">Featured Channel Content:</h4>
+                        <h4 style="color:var(--neon-cyan); margin-bottom:6px;">Featured Tutorial by Jaydeep:</h4>
                         <p style="color:#c5d4e2; font-size:12.5px; line-height:1.6;">
-                            Watch live security tutorials on <strong>SIEM Tools</strong>, <strong>Kali Linux optimizations</strong>, python scripting, and practical ethical hacking fundamentals published on <strong>@js44</strong>. Click <em>"Open in Full Browser"</em> above to navigate the complete video library directly on YouTube.
+                            Comprehensive walkthrough covering <strong>SIEM architecture</strong>, <strong>log telemetry analysis</strong>, and real-time defensive monitoring. Click <em>"Open Direct Live Page"</em> to browse the full catalogue on YouTube.
                         </p>
                     </div>
                 </div>
             `;
         }
 
-        // 2. TryHackMe App
+        // APP: TRYHACKME
         function renderTHM(container) {
             container.innerHTML = `
                 <div class="webapp-view">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                        <div>
-                            <h2 style="color:#ff3344; font-size:18px;">TryHackMe Profile // Jaydeep.Shirsath</h2>
-                            <span style="color:var(--text-dim); font-size:12px;">Cybersecurity Candidate & CTF Competitor</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-dim); padding-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:24px;">🛡️</span>
+                            <div>
+                                <h2 style="color:#ff3344; font-size:17px;">TryHackMe Profile Matrix</h2>
+                                <span style="color:var(--text-dim); font-size:11.5px;">User Handle: <strong>Jaydeep.Shirsath</strong> [Active Candidate]</span>
+                            </div>
                         </div>
-                        <a href="https://tryhackme.com/p/Jaydeep.Shirsath" target="_blank" class="browser-open-btn">
-                            Visit Live THM Profile ↗
+                        <a href="https://tryhackme.com/p/Jaydeep.Shirsath" target="_blank" class="browser-open-btn" style="background:rgba(255,51,68,0.15); border-color:#ff3344; color:#ff3344;">
+                            Live THM Profile ↗
                         </a>
                     </div>
                     <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:16px;">
                         <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:#ff3344;">Top 15%</div><div style="font-size:11px; color:var(--text-dim);">Global Standings</div></div>
-                        <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:#fff;">30+</div><div style="font-size:11px; color:var(--text-dim);">Labs Completed</div></div>
-                        <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:var(--neon-green);">100%</div><div style="font-size:11px; color:var(--text-dim);">Offensive PrivEsc Focus</div></div>
+                        <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:#fff;">30+</div><div style="font-size:11px; color:var(--text-dim);">Rooms Pwned</div></div>
+                        <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:var(--neon-green);">100%</div><div style="font-size:11px; color:var(--text-dim);">Root Shell Success</div></div>
                     </div>
-                    <div style="background:var(--bg-elevated); padding:16px; border-radius:6px; border:1px solid var(--border-dim); line-height:1.7; font-size:12px; color:#d1dde8;">
-                        <strong style="color:#ff3344; font-size:13px;">Specialized Machine Exploitation Badges:</strong>
+                    <div style="background:var(--bg-elevated); padding:16px; border-radius:6px; border:1px solid var(--border-dim); line-height:1.7; font-size:12px; color:#d1dde8; margin-bottom:12px;">
+                        <strong style="color:#ff3344; font-size:13px;">Verified Completed Challenges & Certifications:</strong>
                         <ul style="padding-left:18px; margin-top:6px;">
-                            <li><strong>Privilege Escalation:</strong> Linux SUID/SGID binary inspection, /etc/sudoers (NOPASSWD) bypasses, path hijacking.</li>
-                            <li><strong>Web Exploitation:</strong> Arbitrary file upload bypasses, web shells, and spawning stabilized reverse shells via Netcat.</li>
-                            <li><strong>Authentication Attacks:</strong> Network service brute forcing using THC-Hydra and hash cracking with John the Ripper.</li>
+                            <li><strong>Industrial Intrusion CTF:</strong> Certificate ID: <code style="color:var(--neon-cyan)">THM-9R5WY0NXOT</code></li>
+                            <li><strong>Offensive Security Pathways:</strong> Certificate ID: <code style="color:var(--neon-cyan)">THM-6TIOL4HYE6</code></li>
+                            <li><strong>Exploitation Vectors:</strong> Linux SUID/SGID binary abuse, sudoers path injection, Netcat reverse shell stabilization, THC-Hydra password brute forcing, and John the Ripper hash cracking.</li>
                         </ul>
                     </div>
                 </div>
             `;
         }
 
-        // 3. Hack The Box App
+        // APP: HACK THE BOX
         function renderHTB(container) {
             container.innerHTML = `
                 <div class="webapp-view">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                        <div>
-                            <h2 style="color:var(--neon-green); font-size:18px;">Hack The Box Workstation</h2>
-                            <span style="color:var(--text-dim); font-size:12px;">Candidate: Jaydeep Shirsath</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-dim); padding-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:24px;">🟩</span>
+                            <div>
+                                <h2 style="color:var(--neon-green); font-size:17px;">Hack The Box Workstation</h2>
+                                <span style="color:var(--text-dim); font-size:11.5px;">Account ID: <strong>019e6d7d-e327-7384-82d6-298def550f7d</strong></span>
+                            </div>
                         </div>
-                        <a href="https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url" target="_blank" class="browser-open-btn">
-                            Visit Live HTB Profile ↗
+                        <a href="https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url" target="_blank" class="browser-open-btn" style="background:rgba(0,255,102,0.15); border-color:var(--neon-green); color:var(--neon-green);">
+                            Live HTB Profile ↗
                         </a>
                     </div>
                     <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:16px;">
-                        <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:var(--neon-green);">Active</div><div style="font-size:11px; color:var(--text-dim);">Platform Status</div></div>
+                        <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:var(--neon-green);">ACTIVE</div><div style="font-size:11px; color:var(--text-dim);">Membership Status</div></div>
                         <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:#fff;">Linux / Win</div><div style="font-size:11px; color:var(--text-dim);">Target Architectures</div></div>
-                        <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:var(--neon-cyan);">Full Root</div><div style="font-size:11px; color:var(--text-dim);">PrivEsc Objective</div></div>
+                        <div class="stat-badge"><div style="font-size:22px; font-weight:bold; color:var(--neon-cyan);">Full Root</div><div style="font-size:11px; color:var(--text-dim);">Exploitation Focus</div></div>
                     </div>
                     <div style="background:var(--bg-elevated); padding:16px; border-radius:6px; border:1px solid var(--border-dim); line-height:1.7; font-size:12px; color:#d1dde8;">
                         <strong style="color:var(--neon-green); font-size:13px;">Penetration Testing Competencies:</strong>
                         <ul style="padding-left:18px; margin-top:6px;">
-                            <li><strong>Reconnaissance:</strong> Port auditing and service banner grabbing via Nmap and custom NSE scripts.</li>
-                            <li><strong>Foothold:</strong> Exploiting upload endpoints, catching reverse shells, and upgrading to interactive TTY.</li>
-                            <li><strong>Post-Exploitation:</strong> Internal privilege escalation to root on virtual targets.</li>
+                            <li><strong>Nmap Reconnaissance:</strong> Comprehensive host discovery, port enumeration, OS fingerprinting, and NSE script auditing.</li>
+                            <li><strong>Arbitrary File Upload:</strong> Bypassing MIME/extension controls to deploy web shells and execute commands remotely.</li>
+                            <li><strong>Privilege Escalation:</strong> Auditing misconfigured permissions, internal service hijacking, and achieving root on Linux targets.</li>
                         </ul>
                     </div>
                 </div>
             `;
         }
 
-        // 4. Credly & Cloud Badges
+        // APP: CREDLY
         function renderCredly(container) {
             container.innerHTML = `
                 <div class="webapp-view">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                        <div>
-                            <h2 style="color:var(--neon-amber); font-size:18px;">Credly Verified Credentials</h2>
-                            <span style="color:var(--text-dim); font-size:12px;">Recipient: Jaydeep Shirsath</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-dim); padding-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:24px;">🎖️</span>
+                            <div>
+                                <h2 style="color:var(--neon-amber); font-size:17px;">Credly Verified Credentials</h2>
+                                <span style="color:var(--text-dim); font-size:11.5px;">Recipient: <strong>Jaydeep Shirsath</strong></span>
+                            </div>
                         </div>
-                        <a href="https://www.credly.com/users/jaydeep-shirsath" target="_blank" class="browser-open-btn">
-                            Verify Live Badges on Credly ↗
+                        <a href="https://www.credly.com/users/jaydeep-shirsath" target="_blank" class="browser-open-btn" style="background:rgba(255,183,0,0.15); border-color:var(--neon-amber); color:var(--neon-amber);">
+                            Verify on Credly ↗
                         </a>
                     </div>
-                    <div style="background:var(--bg-elevated); padding:16px; border-radius:6px; border:1px solid var(--border-dim); margin-bottom:14px;">
-                        <h4 style="color:#fff; margin-bottom:8px;">Google Cloud Arcade Facilitator Alum</h4>
-                        <p style="font-size:12.5px; color:#c5d4e2; line-height:1.6;">
-                            Awarded verified skill badges and official Google Cloud Arcade swags for completing specialized tracks in Cloud IAM, least-privilege security roles, compute resource quotas, and VPC network isolation.
+                    <div style="background:var(--bg-elevated); padding:16px; border-radius:6px; border:1px solid var(--border-dim); margin-bottom:14px; line-height:1.6;">
+                        <h4 style="color:#fff; margin-bottom:6px;">Google Cloud Arcade Facilitator Alum</h4>
+                        <p style="font-size:12.5px; color:#c5d4e2;">
+                            Completed specialized hands-on security and cloud computing tracks including Cloud IAM, resource permission policies, VPC isolation, and infrastructure governance. Awarded official Google Cloud program swags and verified badges.
                         </p>
                     </div>
                 </div>
             `;
         }
 
-        // 5. LinkedIn Dossier
+        // APP: LINKEDIN
         function renderLinkedIn(container) {
             container.innerHTML = `
                 <div class="webapp-view">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                        <div>
-                            <h2 style="color:#00e5ff; font-size:18px;">LinkedIn Professional Dossier</h2>
-                            <span style="color:var(--text-dim); font-size:12px;">Jaydeep Shirsath • Pune, Maharashtra, India</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border-dim); padding-bottom:12px;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:24px;">💼</span>
+                            <div>
+                                <h2 style="color:#00e5ff; font-size:17px;">LinkedIn Profile Dossier</h2>
+                                <span style="color:var(--text-dim); font-size:11.5px;">Jaydeep Shirsath • Pune, Maharashtra, India</span>
+                            </div>
                         </div>
                         <a href="https://www.linkedin.com/in/jaydeep-shirsath-82452a380?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="browser-open-btn">
                             Connect on LinkedIn ↗
@@ -895,7 +1024,7 @@
                         <strong style="color:#fff;">Headline:</strong> Cybersecurity Undergraduate (BCA @ ADYPU '28) | Technical Lead & Cyber Security Lead at MindMesh Club | Hands-on Penetration Tester & Problem Solver.
                     </div>
                     <div style="background:var(--bg-elevated); padding:16px; border-radius:6px; border:1px solid var(--border-dim); line-height:1.6; font-size:12.5px;">
-                        <strong style="color:#fff;">Leadership Experience:</strong>
+                        <strong style="color:#fff;">Leadership & Campus Experience:</strong>
                         <div style="color:var(--neon-cyan); margin-top:4px;">Technical Lead & Cybersecurity Lead — MindMesh Club</div>
                         <p style="color:#c5d4e2; font-size:12px; margin-top:4px;">Lead technical workshops, guide student study groups through CTFs, and provide technical troubleshooting support to university classmates and faculty for security tool setups (Ghidra, VirtualBox, VMware, Burp Suite).</p>
                     </div>
@@ -903,7 +1032,7 @@
             `;
         }
 
-        // 6. Terminal Console
+        // APP: TERMINAL
         function renderTerminal(container) {
             container.innerHTML = `
                 <div class="term-container" onclick="document.getElementById('termInput').focus()">
@@ -936,14 +1065,13 @@ Type 'help' to audit system capabilities, or try 'skills', 'projects', 'cat resu
             });
         }
 
-        // 7. File Manager & Recycle Bin
+        // APP: FILE MANAGER
         let VFS = [
             { id: 1, name: 'Jaydeep_Resume.pdf', folder: 'home', size: '142 KB', action: () => openApp('resume') },
             { id: 2, name: 'privesc_audit.sh', folder: 'home', size: '12 KB', action: () => openApp('terminal') },
             { id: 3, name: 'root_flag.txt', folder: 'home', size: '1 KB', action: () => alert("Flag: THM{PR1V_35C4L4T10N_M45T3R_JAYDEEP}") }
         ];
         let TRASH = [];
-        let currentFolder = 'home';
 
         function renderFileManager(container) {
             container.innerHTML = `
@@ -969,7 +1097,7 @@ Type 'help' to audit system capabilities, or try 'skills', 'projects', 'cat resu
             container.innerHTML = `<div style="padding:20px; font-family:var(--font-mono); color:var(--text-dim); text-align:center;">Recycle Bin is empty.</div>`;
         }
 
-        // 8. Printable Resume
+        // APP: PRINTABLE RESUME
         function renderResume(container) {
             container.innerHTML = `
                 <div style="padding:24px; background:#090e14; height:100%; overflow-y:auto;">
@@ -997,10 +1125,6 @@ Type 'help' to audit system capabilities, or try 'skills', 'projects', 'cat resu
         setInterval(() => {
             document.getElementById('clock').innerText = new Date().toTimeString().split(' ')[0];
         }, 1000);
-
-        window.addEventListener('load', () => {
-            openApp('terminal');
-        });
     </script>
 </body>
 </html>
