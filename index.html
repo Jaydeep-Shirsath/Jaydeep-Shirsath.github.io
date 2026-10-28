@@ -39,7 +39,6 @@
             font-size: 13px;
         }
 
-        /* Matrix / Cyber Grid Canvas */
         #matrixCanvas {
             position: fixed;
             top: 0;
@@ -51,7 +50,6 @@
             pointer-events: none;
         }
 
-        /* CRT Scanlines Overlay */
         .scanlines {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -62,7 +60,6 @@
             opacity: 0.35;
         }
 
-        /* Desktop Container */
         #desktop {
             position: relative;
             width: 100%;
@@ -77,7 +74,6 @@
             align-content: start;
         }
 
-        /* Desktop Icon */
         .desktop-icon {
             display: flex;
             flex-direction: column;
@@ -119,7 +115,6 @@
             word-break: break-word;
         }
 
-        /* Window Styling */
         .window {
             position: absolute;
             background: var(--bg-surface);
@@ -232,7 +227,6 @@
             -webkit-user-select: text;
         }
 
-        /* Taskbar */
         #taskbar {
             position: fixed;
             bottom: 0;
@@ -317,7 +311,6 @@
             font-weight: 600;
         }
 
-        /* Start Menu */
         #startMenu {
             position: fixed;
             bottom: calc(var(--taskbar-h) + 6px);
@@ -373,7 +366,6 @@
             height: 18px;
         }
 
-        /* Context Menu */
         #contextMenu {
             position: fixed;
             background: var(--bg-elevated);
@@ -398,8 +390,6 @@
             background: rgba(0, 229, 255, 0.18);
             color: var(--neon-cyan);
         }
-
-        /* --- APP SPECIFIC STYLES --- */
 
         /* 1. Terminal */
         .term-container {
@@ -509,7 +499,7 @@
             margin-bottom: 6px;
         }
 
-        /* 3. YouTube In-App Player */
+        /* 3. YouTube App */
         .yt-container {
             display: flex;
             flex-direction: column;
@@ -520,8 +510,9 @@
         .yt-player-box {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 52%;
             background: #000;
+            border-bottom: 1px solid var(--border-dim);
         }
 
         .yt-player-box iframe {
@@ -564,6 +555,45 @@
             font-family: var(--font-mono);
         }
 
+        .yt-playlist-title {
+            font-size: 12px;
+            color: var(--neon-cyan);
+            font-family: var(--font-mono);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .yt-video-card {
+            display: flex;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            background: var(--bg-elevated);
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .yt-video-card:hover {
+            border-color: rgba(255, 0, 51, 0.4);
+            background: rgba(255, 0, 51, 0.08);
+        }
+
+        .yt-video-thumb {
+            width: 80px;
+            height: 48px;
+            background: #111;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-red);
+            font-size: 16px;
+            border: 1px solid var(--border-dim);
+            flex-shrink: 0;
+        }
+
         /* 4. LinkedIn Dossier */
         .li-container {
             padding: 20px;
@@ -573,7 +603,7 @@
         }
 
         .li-banner {
-            height: 100px;
+            height: 90px;
             background: linear-gradient(90deg, #0d3b66, #001e3d);
             border-radius: 8px 8px 0 0;
             position: relative;
@@ -588,8 +618,8 @@
         }
 
         .li-avatar {
-            width: 80px;
-            height: 80px;
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
             border: 4px solid var(--bg-elevated);
             background: var(--neon-cyan);
@@ -597,25 +627,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
+            font-size: 24px;
             font-weight: bold;
             position: absolute;
-            bottom: -40px;
+            bottom: -38px;
             left: 20px;
         }
 
         .li-body {
-            padding: 48px 20px 20px 20px;
+            padding: 44px 20px 20px 20px;
         }
 
         .li-name {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: bold;
             color: #fff;
         }
 
         .li-headline {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--neon-cyan);
             font-family: var(--font-mono);
             margin: 4px 0 10px 0;
@@ -627,10 +657,10 @@
         }
 
         .li-sec-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: var(--text-main);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-family: var(--font-mono);
@@ -705,82 +735,8 @@
             color: var(--neon-cyan);
         }
 
-        /* 6. Credly / Certs Hub */
-        .cert-container {
-            padding: 20px;
-            height: 100%;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 16px;
-        }
-
-        .cert-card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-dim);
-            border-radius: 8px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            transition: 0.2s;
-        }
-
-        .cert-card:hover {
-            border-color: var(--neon-amber);
-            transform: translateY(-2px);
-        }
-
-        .cert-badge-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            background: rgba(255, 183, 0, 0.1);
-            border: 1px solid rgba(255, 183, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--neon-amber);
-        }
-
-        /* 7. Gallery */
-        .gal-container {
-            padding: 20px;
-            height: 100%;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-        }
-
-        .gal-card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-dim);
-            border-radius: 6px;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .gal-thumb {
-            height: 130px;
-            background: #04070a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dim);
-            border-bottom: 1px solid var(--border-dim);
-            position: relative;
-        }
-
-        .gal-title {
-            padding: 10px;
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--text-main);
-        }
-
-        /* 8. HTB / TryHackMe Workstation */
-        .ctf-container {
+        /* 6. In-App Station Platform Containers */
+        .station-container {
             padding: 20px;
             height: 100%;
             overflow-y: auto;
@@ -788,32 +744,65 @@
             font-family: var(--font-mono);
         }
 
-        .ctf-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
+        .station-banner {
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        .stat-box {
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
             background: var(--bg-elevated);
             border: 1px solid var(--border-dim);
             padding: 12px;
             border-radius: 6px;
+            text-align: center;
         }
 
-        .stat-val {
-            font-size: 20px;
+        .stat-num {
+            font-size: 22px;
             font-weight: bold;
-            color: var(--neon-green);
         }
 
-        .stat-lbl {
+        .stat-txt {
             font-size: 11px;
             color: var(--text-dim);
+            margin-top: 2px;
         }
 
-        /* Scrollbars */
+        .station-box {
+            background: var(--bg-elevated);
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border-dim);
+            line-height: 1.7;
+            font-size: 12px;
+            color: #d1dde8;
+            margin-bottom: 14px;
+        }
+
+        .badge-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 183, 0, 0.1);
+            border: 1px solid rgba(255, 183, 0, 0.3);
+            color: var(--neon-amber);
+            padding: 6px 12px;
+            border-radius: 4px;
+            margin: 4px;
+            font-size: 11.5px;
+        }
+
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -829,7 +818,6 @@
             background: var(--neon-cyan);
         }
 
-        /* Print Override for Resume */
         @media print {
             body * { visibility: hidden; }
             #resumePaper, #resumePaper * { visibility: visible; }
@@ -852,16 +840,11 @@
 </head>
 <body>
 
-    <!-- Dynamic Animated Matrix Canvas -->
     <canvas id="matrixCanvas"></canvas>
     <div class="scanlines"></div>
 
-    <!-- Desktop Workspace -->
-    <div id="desktop">
-        <!-- Icons created via JS below -->
-    </div>
+    <div id="desktop"></div>
 
-    <!-- Taskbar -->
     <div id="taskbar">
         <button class="start-btn" onclick="toggleStartMenu()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -875,7 +858,6 @@
         </div>
     </div>
 
-    <!-- Start Menu -->
     <div id="startMenu">
         <div class="start-header">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
@@ -894,6 +876,18 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 Resume (PDF Viewer)
             </li>
+            <li class="start-item" onclick="openApp('thm'); toggleStartMenu();">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>
+                TryHackMe Station
+            </li>
+            <li class="start-item" onclick="openApp('htb'); toggleStartMenu();">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#00ff66" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/></svg>
+                Hack The Box Station
+            </li>
+            <li class="start-item" onclick="openApp('credly'); toggleStartMenu();">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ffb700" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+                Credly & Cloud Badges
+            </li>
             <li class="start-item" onclick="openApp('youtube'); toggleStartMenu();">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
                 YouTube Hub (@js44)
@@ -902,14 +896,6 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
                 LinkedIn Dossier
             </li>
-            <li class="start-item" onclick="openApp('certs'); toggleStartMenu();">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#ffb700" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-                Certificates & Credly
-            </li>
-            <li class="start-item" onclick="openApp('gallery'); toggleStartMenu();">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                Lab & CTF Gallery
-            </li>
             <li class="start-item" onclick="openApp('trash'); toggleStartMenu();">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 Recycle Bin
@@ -917,7 +903,6 @@
         </ul>
     </div>
 
-    <!-- Desktop Right-Click Context Menu -->
     <div id="contextMenu">
         <div class="context-item" onclick="openApp('terminal'); hideContextMenu();">Open Terminal</div>
         <div class="context-item" onclick="openApp('files'); hideContextMenu();">Open File Manager</div>
@@ -926,9 +911,6 @@
     </div>
 
     <script>
-        /* =========================================================================
-           1. AUDIO SYNTHESIZER (NO EXTERNAL AUDIO FILES NEEDED)
-           ========================================================================= */
         let audioCtx = null;
         let soundEnabled = true;
 
@@ -960,9 +942,6 @@
             document.getElementById('audioToggle').innerText = soundEnabled ? '🔊 FX: ON' : '🔈 FX: OFF';
         }
 
-        /* =========================================================================
-           2. ANIMATED MATRIX RAIN BACKGROUND
-           ========================================================================= */
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -997,9 +976,6 @@
         }
         setInterval(drawMatrix, 42);
 
-        /* =========================================================================
-           3. DESKTOP ICON & APP DEFINITIONS
-           ========================================================================= */
         const APPS = {
             terminal: {
                 id: 'terminal',
@@ -1024,48 +1000,50 @@
                 extLabel: 'Hire / Email',
                 render: renderResume
             },
+            thm: {
+                id: 'thm',
+                title: 'TryHackMe Station - Jaydeep.Shirsath',
+                icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>',
+                width: 700, height: 480, x: 170, y: 70,
+                extUrl: 'https://tryhackme.com/p/Jaydeep.Shirsath',
+                extLabel: 'Open TryHackMe.com ↗',
+                render: renderTHM
+            },
+            htb: {
+                id: 'htb',
+                title: 'Hack The Box Workstation',
+                icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00ff66" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/></svg>',
+                width: 700, height: 480, x: 200, y: 80,
+                extUrl: 'https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url',
+                extLabel: 'Open HackTheBox.com ↗',
+                render: renderHTB
+            },
+            credly: {
+                id: 'credly',
+                title: 'Credly Credentials & Cloud Badges',
+                icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffb700" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+                width: 700, height: 470, x: 220, y: 90,
+                extUrl: 'https://www.credly.com/users/jaydeep-shirsath',
+                extLabel: 'Verify on Credly ↗',
+                render: renderCredly
+            },
             youtube: {
                 id: 'youtube',
-                title: 'YouTube In-App Hub (@js44)',
+                title: 'YouTube Hub - Jaydeep Shirsath (@js44)',
                 icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff3344" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>',
-                width: 740, height: 500, x: 140, y: 60,
+                width: 760, height: 530, x: 140, y: 60,
                 extUrl: 'https://youtube.com/@js44?si=4xPaJYq3JOWW5VBK',
                 extLabel: 'Open on YouTube.com ↗',
                 render: renderYouTube
             },
             linkedin: {
                 id: 'linkedin',
-                title: 'Professional Dossier - LinkedIn',
+                title: 'LinkedIn Dossier - Jaydeep Shirsath',
                 icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>',
-                width: 700, height: 480, x: 180, y: 70,
+                width: 700, height: 480, x: 190, y: 70,
                 extUrl: 'https://www.linkedin.com/in/jaydeep-shirsath-82452a380?utm_source=share_via&utm_content=profile&utm_medium=member_android',
                 extLabel: 'Open on LinkedIn.com ↗',
                 render: renderLinkedIn
-            },
-            ctf: {
-                id: 'ctf',
-                title: 'Offensive Security Hub (HTB & THM)',
-                icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00ff66" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>',
-                width: 700, height: 460, x: 200, y: 80,
-                extUrl: 'https://tryhackme.com/p/Jaydeep.Shirsath',
-                extLabel: 'Launch THM Profile ↗',
-                render: renderCTFHub
-            },
-            certs: {
-                id: 'certs',
-                title: 'Certificates & Credly Badges',
-                icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffb700" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
-                width: 680, height: 440, x: 220, y: 90,
-                extUrl: 'https://www.credly.com/users/jaydeep-shirsath',
-                extLabel: 'Verify on Credly ↗',
-                render: renderCerts
-            },
-            gallery: {
-                id: 'gallery',
-                title: 'Lab & CTF Capture Gallery',
-                icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
-                width: 680, height: 420, x: 240, y: 100,
-                render: renderGallery
             },
             trash: {
                 id: 'trash',
@@ -1076,27 +1054,27 @@
             }
         };
 
-        // Render Desktop Icons
         const desktop = document.getElementById('desktop');
         Object.values(APPS).forEach(app => {
             const el = document.createElement('div');
             el.className = 'desktop-icon';
-            el.innerHTML = `${app.icon}<span>${app.id === 'resume' ? 'Resume.pdf' : (app.id.toUpperCase())}</span>`;
+            let label = app.id.toUpperCase();
+            if (app.id === 'resume') label = 'Resume.pdf';
+            if (app.id === 'thm') label = 'TryHackMe';
+            if (app.id === 'htb') label = 'HackTheBox';
+            if (app.id === 'credly') label = 'Credly';
+            el.innerHTML = `${app.icon}<span>${label}</span>`;
             el.ondblclick = () => openApp(app.id);
             el.onclick = () => playBeep(900, 0.03);
             desktop.appendChild(el);
         });
 
-        /* =========================================================================
-           4. VIRTUAL FILE SYSTEM WITH WORKING RECYCLE BIN
-           ========================================================================= */
         let VFS = [
             { id: 1, name: 'Jaydeep_Resume.pdf', type: 'file', folder: 'home', icon: 'file', size: '142 KB', action: () => openApp('resume') },
             { id: 2, name: 'privesc_audit.sh', type: 'file', folder: 'home', icon: 'code', size: '12 KB', action: () => openApp('terminal') },
             { id: 3, name: 'ghidra_re_notes.txt', type: 'file', folder: 'documents', icon: 'text', size: '4 KB', action: () => openFileText('ghidra') },
             { id: 4, name: 'network_recon_nmap.xml', type: 'file', folder: 'documents', icon: 'code', size: '18 KB', action: () => openFileText('nmap') },
-            { id: 5, name: 'google_cloud_swags.png', type: 'file', folder: 'gallery', icon: 'img', size: '1.2 MB', action: () => openApp('gallery') },
-            { id: 6, name: 'root_flag_proof.txt', type: 'file', folder: 'home', icon: 'text', size: '1 KB', action: () => openFileText('flag') }
+            { id: 5, name: 'root_flag_proof.txt', type: 'file', folder: 'home', icon: 'text', size: '1 KB', action: () => openFileText('flag') }
         ];
 
         let TRASH = [
@@ -1149,9 +1127,6 @@
             renderFileManagerBody();
         }
 
-        /* =========================================================================
-           5. WINDOW MANAGEMENT ENGINE (DRAG, RESIZE, MAX, MIN, FOCUS)
-           ========================================================================= */
         const windows = {};
         let topZ = 20;
 
@@ -1187,7 +1162,7 @@
                 </div>
                 ${app.extUrl ? `
                 <div class="window-subbar">
-                    <span>STATUS: IN-APP SANDBOX ACTIVE</span>
+                    <span>SECURITY IN-APP ENCLAVE</span>
                     <a href="${app.extUrl}" target="_blank" class="ext-btn">${app.extLabel}</a>
                 </div>` : ''}
                 <div class="window-body" id="body_${appId}"></div>
@@ -1197,9 +1172,7 @@
             document.body.appendChild(winEl);
             windows[appId] = winEl;
 
-            // Render App Body Content
             app.render(document.getElementById(`body_${appId}`));
-
             updateTaskbar();
         }
 
@@ -1276,7 +1249,6 @@
             });
         }
 
-        /* Dragging logic */
         let draggedWin = null, dragOffsetX = 0, dragOffsetY = 0;
         function startDrag(e, appId) {
             focusWindow(appId);
@@ -1301,11 +1273,6 @@
             window.removeEventListener('mouseup', stopDrag);
         }
 
-        /* =========================================================================
-           6. APP VIEW RENDERING FUNCTIONS
-           ========================================================================= */
-
-        // APP: TERMINAL
         function renderTerminal(container) {
             container.innerHTML = `
                 <div class="term-container" onclick="document.getElementById('termInput').focus()">
@@ -1343,7 +1310,7 @@ Type 'help' to audit system capabilities, or try 'skills', 'projects', 'cat resu
   <span style="color:var(--neon-cyan)">projects</span>   - Hands-on exploitation & forensics labs
   <span style="color:var(--neon-cyan)">privesc</span>    - Privilege escalation methodologies
   <span style="color:var(--neon-cyan)">clear</span>      - Wipe console buffer
-  <span style="color:var(--neon-cyan)">gui</span>        - Open GUI applications (e.g. 'gui youtube', 'gui resume')`;
+  <span style="color:var(--neon-cyan)">gui</span>        - Open GUI applications (e.g. 'gui youtube', 'gui thm', 'gui htb', 'gui credly')`;
             } else if (low === 'about') {
                 outEl.innerHTML += `[Jaydeep Shirsath] - Cybersecurity Undergrad (BCA @ ADYPU, Pune). Expected 2028.
 Technical Lead & Cybersecurity Lead at MindMesh Club.
@@ -1368,20 +1335,18 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             } else if (low.startsWith('gui ')) {
                 const targetApp = low.split(' ')[1];
                 if (APPS[targetApp]) openApp(targetApp);
-                else outEl.innerHTML += `Unknown app '${targetApp}'. Try 'gui youtube', 'gui resume', 'gui files'.`;
+                else outEl.innerHTML += `Unknown app '${targetApp}'. Try 'gui youtube', 'gui thm', 'gui htb', 'gui credly', 'gui resume'.`;
             } else {
                 outEl.innerHTML += `bash: command not found: ${cmd}. Type 'help' for options.`;
             }
         }
 
-        // APP: FILE MANAGER
         function renderFileManager(container) {
             container.innerHTML = `
                 <div class="fm-container">
                     <div class="fm-sidebar">
                         <div class="fm-nav-item ${currentFolder === 'home' ? 'active' : ''}" onclick="setFolder('home')">📁 Home</div>
                         <div class="fm-nav-item ${currentFolder === 'documents' ? 'active' : ''}" onclick="setFolder('documents')">📄 Documents</div>
-                        <div class="fm-nav-item ${currentFolder === 'gallery' ? 'active' : ''}" onclick="setFolder('gallery')">🖼️ Gallery</div>
                         <div class="fm-nav-item" onclick="openApp('trash')">🗑️ Recycle Bin (${TRASH.length})</div>
                         <div style="margin-top:20px; padding:6px;">
                             <button class="ext-btn" style="width:100%; justify-content:center;" onclick="createSampleFile()">+ New File</button>
@@ -1427,7 +1392,6 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             });
         }
 
-        // APP: RECYCLE BIN
         function renderTrash(container) {
             container.innerHTML = `
                 <div style="padding:16px; height:100%; display:flex; flex-direction:column;">
@@ -1460,12 +1424,26 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             });
         }
 
-        // APP: YOUTUBE IN-APP
+        /* 3. WORKING IN-APP YOUTUBE PLAYER */
+        function switchYtVideo(videoId, title) {
+            const iframe = document.getElementById('ytIframePlayer');
+            const titleEl = document.getElementById('ytCurrentTitle');
+            if (iframe) {
+                iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
+            }
+            if (titleEl) {
+                titleEl.innerText = title;
+            }
+            playBeep(650, 0.04);
+        }
+
         function renderYouTube(container) {
+            const primaryVideoId = "3Kq1MIfTWCE"; 
+
             container.innerHTML = `
                 <div class="yt-container">
                     <div class="yt-player-box">
-                        <iframe src="https://www.youtube.com/embed/videoseries?list=PLr6-SvnZBg8Fm5aM_1Zp0iLhV37P_lq6T" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <iframe id="ytIframePlayer" src="https://www.youtube-nocookie.com/embed/${primaryVideoId}?rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
                     <div class="yt-details">
                         <div class="yt-channel-card">
@@ -1473,20 +1451,158 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
                                 <div class="yt-avatar">JS</div>
                                 <div>
                                     <h3 style="color:#fff; font-size:16px;">Jaydeep Shirsath (@js44)</h3>
-                                    <p style="color:var(--text-dim); font-size:12px; font-family:var(--font-mono);">Cybersecurity Tutorials • Ethical Hacking • Tech Mentorship</p>
+                                    <p style="color:var(--text-dim); font-size:12px; font-family:var(--font-mono);">Cybersecurity Tutorials • Ethical Hacking Walkthroughs • Tech Mentorship</p>
                                 </div>
                             </div>
-                            <a href="https://youtube.com/@js44?si=4xPaJYq3JOWW5VBK" target="_blank" class="ext-btn" style="background:#ff0033; color:#fff; border:none;">Subscribe ↗</a>
+                            <a href="https://youtube.com/@js44?si=4xPaJYq3JOWW5VBK" target="_blank" class="ext-btn" style="background:#ff0033; color:#fff; border:none;">Visit Channel on YouTube ↗</a>
                         </div>
-                        <div style="font-size:12.5px; color:#c0d0de; line-height:1.6;">
-                            <strong>Channel Mission:</strong> Providing accessible technical guides on penetration testing, CTF walkthroughs, tool setups (Ghidra, VirtualBox, VMware, Burp Suite), and troubleshooting common Linux/development errors for university students and peers.
+                        
+                        <div style="font-size:12px; color:var(--neon-cyan); margin-bottom:10px; font-family:var(--font-mono);">
+                            ▶ Currently Selected: <span id="ytCurrentTitle" style="color:#fff;">Hands-on Cybersecurity & Ethical Hacking Lab</span>
+                        </div>
+
+                        <div class="yt-playlist-title">CLICK ANY VIDEO BELOW TO PLAY DIRECTLY HERE:</div>
+                        
+                        <div class="yt-video-card" onclick="switchYtVideo('3Kq1MIfTWCE', 'Introduction to Ethical Hacking & Security Labs')">
+                            <div class="yt-video-thumb">▶</div>
+                            <div>
+                                <strong style="color:#fff; font-size:12px;">Introduction to Ethical Hacking & Security Labs</strong>
+                                <p style="color:var(--text-dim); font-size:11px; margin-top:2px;">Learn core security workflows and terminal command-line navigation.</p>
+                            </div>
+                        </div>
+
+                        <div class="yt-video-card" onclick="switchYtVideo('fNZpcpm_Wio', 'Linux Command Line for Hackers & Pentesting')">
+                            <div class="yt-video-thumb">▶</div>
+                            <div>
+                                <strong style="color:#fff; font-size:12px;">Linux Command Line for Hackers & Pentesting</strong>
+                                <p style="color:var(--text-dim); font-size:11px; margin-top:2px;">Navigation, file permissions (chmod, chown), and reverse shell handling.</p>
+                            </div>
+                        </div>
+
+                        <div class="yt-video-card" onclick="switchYtVideo('2_lswM1S264', 'Ghidra & Reverse Engineering Fundamentals')">
+                            <div class="yt-video-thumb">▶</div>
+                            <div>
+                                <strong style="color:#fff; font-size:12px;">Ghidra & Reverse Engineering Fundamentals</strong>
+                                <p style="color:var(--text-dim); font-size:11px; margin-top:2px;">Decompiling stripped binaries and isolating hidden logic check routines.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        // APP: LINKEDIN DOSSIER
+        /* 4. SEPARATE TRYHACKME STATION */
+        function renderTHM(container) {
+            container.innerHTML = `
+                <div class="station-container">
+                    <div class="station-banner" style="background: rgba(255, 51, 68, 0.1); border: 1px solid rgba(255, 51, 68, 0.3);">
+                        <div>
+                            <h2 style="color:#ff3344; font-size:16px;">TRYHACKME DEFENSIVE & OFFENSIVE STATION</h2>
+                            <span style="font-size:11px; color:var(--text-dim);">Profile: Jaydeep.Shirsath</span>
+                        </div>
+                        <a href="https://tryhackme.com/p/Jaydeep.Shirsath" target="_blank" class="ext-btn" style="background:#ff3344; color:#fff; border:none;">Launch THM Profile ↗</a>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-num" style="color:#ff3344;">Top 15%</div>
+                            <div class="stat-txt">Global Rank</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-num" style="color:#fff;">30+</div>
+                            <div class="stat-txt">Rooms Solved</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-num" style="color:var(--neon-green);">100%</div>
+                            <div class="stat-txt">Offensive Path Focus</div>
+                        </div>
+                    </div>
+                    <div class="station-box">
+                        <strong style="color:#ff3344; font-size:13px;">Demonstrated Exploitation Vectors:</strong>
+                        <ul style="padding-left:18px; margin-top:6px; line-height:1.7;">
+                            <li><strong>Privilege Escalation:</strong> SUID/SGID binary abuse, dirty cow exploration, /etc/sudoers (NOPASSWD) validation.</li>
+                            <li><strong>Web Fundamentals:</strong> MIME spoofing, arbitrary file upload bypasses, web shells to Netcat listeners.</li>
+                            <li><strong>Credential Attacks:</strong> THC-Hydra for remote services; John the Ripper hash cracking.</li>
+                            <li><strong>Reverse Shells:</strong> Spawning interactive shells and stabilizing with Python PTY and stty raw.</li>
+                        </ul>
+                    </div>
+                    <div style="background:rgba(255, 51, 68, 0.05); padding:12px; border-radius:6px; border:1px solid rgba(255, 51, 68, 0.2); font-size:11.5px; color:#d1dde8;">
+                        <span style="color:#ff3344; font-weight:bold;">Active Room Disciplines:</span> Jr Penetration Tester Path, Pre-Security, Linux Fundamentals, Network Services, Web Hacking 101.
+                    </div>
+                </div>
+            `;
+        }
+
+        /* 5. SEPARATE HACK THE BOX WORKSTATION */
+        function renderHTB(container) {
+            container.innerHTML = `
+                <div class="station-container">
+                    <div class="station-banner" style="background: rgba(0, 255, 102, 0.1); border: 1px solid rgba(0, 255, 102, 0.3);">
+                        <div>
+                            <h2 style="color:var(--neon-green); font-size:16px;">HACK THE BOX WORKSTATION</h2>
+                            <span style="font-size:11px; color:var(--text-dim);">Candidate: Jaydeep Shirsath</span>
+                        </div>
+                        <a href="https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url" target="_blank" class="ext-btn" style="background:var(--neon-green); color:#000; border:none;">Launch HTB Portal ↗</a>
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-num" style="color:var(--neon-green);">Active</div>
+                            <div class="stat-txt">Status</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-num" style="color:#fff;">Linux & Win</div>
+                            <div class="stat-txt">Lab Targets</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-num" style="color:var(--neon-cyan);">Full Root</div>
+                            <div class="stat-txt">PrivEsc Methodology</div>
+                        </div>
+                    </div>
+                    <div class="station-box">
+                        <strong style="color:var(--neon-green); font-size:13px;">Offensive Penetration Testing Vectors:</strong>
+                        <ul style="padding-left:18px; margin-top:6px; line-height:1.7;">
+                            <li><strong>Service Enumeration:</strong> Aggressive Nmap reconnaissance, custom NSE script vulnerability scanning.</li>
+                            <li><strong>Foothold Exploitation:</strong> Arbitrary file upload to Remote Code Execution (RCE), deploying Netcat handlers.</li>
+                            <li><strong>Privilege Escalation:</strong> Automated LinPEAS auditing, exploiting vulnerable cron jobs and wildcards.</li>
+                            <li><strong>Binary Reverse Engineering:</strong> Decompiling target ELF binaries with Ghidra to bypass authentication routines.</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* 6. CREDLY & BADGES APP */
+        function renderCredly(container) {
+            container.innerHTML = `
+                <div class="station-container">
+                    <div class="station-banner" style="background: rgba(255, 183, 0, 0.1); border: 1px solid rgba(255, 183, 0, 0.3);">
+                        <div>
+                            <h2 style="color:var(--neon-amber); font-size:16px;">CREDLY BADGES & CLOUD CREDENTIALS</h2>
+                            <span style="font-size:11px; color:var(--text-dim);">Issuer Verified Profile: Jaydeep Shirsath</span>
+                        </div>
+                        <a href="https://www.credly.com/users/jaydeep-shirsath" target="_blank" class="ext-btn" style="background:var(--neon-amber); color:#000; border:none;">Verify on Credly ↗</a>
+                    </div>
+                    
+                    <div class="station-box">
+                        <strong style="color:var(--neon-amber); font-size:13px;">Verified Skill Badges & Achievements:</strong>
+                        <div style="margin-top:10px;">
+                            <div class="badge-chip">☁️ Google Cloud Arcade Facilitator Alum</div>
+                            <div class="badge-chip">🛡️ Cloud IAM & Access Management</div>
+                            <div class="badge-chip">🌐 Compute & Storage Security</div>
+                            <div class="badge-chip">🔒 Network Security & VPC Isolation</div>
+                        </div>
+                    </div>
+
+                    <div class="station-box">
+                        <h4 style="color:#fff; margin-bottom:8px;">Google Cloud Arcade Recognition:</h4>
+                        <p style="font-size:12px; color:#c0d0de; line-height:1.6;">
+                            Completed specialized cloud infrastructure, security, and identity tracks. Awarded official Google Cloud program swags and earned digitally verifiable skill badges recorded on Credly.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* 7. LINKEDIN DOSSIER */
         function renderLinkedIn(container) {
             container.innerHTML = `
                 <div class="li-container">
@@ -1500,21 +1616,21 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
                             <div style="font-size:12px; color:var(--text-dim); margin-bottom:14px;">Pune, Maharashtra, India • 500+ Connections</div>
                             <div style="display:flex; gap:10px;">
                                 <a href="mailto:jaydeepshirsath13@gmail.com" class="ext-btn" style="background:var(--neon-cyan); color:#000;">Direct Message</a>
-                                <a href="https://www.linkedin.com/in/jaydeep-shirsath-82452a380?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="ext-btn">Full Profile on LinkedIn ↗</a>
+                                <a href="https://www.linkedin.com/in/jaydeep-shirsath-82452a380?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="ext-btn">Open on LinkedIn.com ↗</a>
                             </div>
                         </div>
                         <div class="li-section">
                             <div class="li-sec-title">About</div>
                             <p style="font-size:12.5px; color:#bccad6; line-height:1.6;">
-                                Second-year Cybersecurity undergraduate at Ajeenkya DY Patil University. Serving as Technical Lead for the MindMesh Club, where I conduct hands-on security workshops and assist peers and faculty with software configurations, hypervisors, and bug fixes. Passionate about CTFs, reverse engineering with Ghidra, privilege escalation, and Cloud IAM.
+                                Second-year Cybersecurity undergraduate at Ajeenkya DY Patil University (Expected 2028). Serving as Technical Lead for the MindMesh Club, where I conduct hands-on security workshops and assist peers and faculty with software configurations, hypervisors, and bug fixes. Passionate about CTFs, reverse engineering with Ghidra, privilege escalation, and Cloud IAM.
                             </p>
                         </div>
                         <div class="li-section">
-                            <div class="li-sec-title">Experience</div>
+                            <div class="li-sec-title">Experience & Leadership</div>
                             <div style="margin-bottom:12px;">
                                 <strong style="color:#fff;">Technical Lead & Cybersecurity Lead</strong> - MindMesh Club<br>
                                 <span style="font-size:11px; color:var(--text-dim);">Nov 2025 - Present • University Campus</span>
-                                <p style="font-size:12px; color:#bccad6; margin-top:4px;">Lead hands-on workshops on Linux tools, vulnerability discovery, and CTFs. Act as the primary campus trouble-shooter for tool installations and Linux permissions.</p>
+                                <p style="font-size:12px; color:#bccad6; margin-top:4px;">Lead hands-on workshops on Linux tools, vulnerability discovery, and CTFs. Act as the primary campus trouble-shooter for tool installations (Ghidra, VirtualBox, VMware) and Linux permissions.</p>
                             </div>
                         </div>
                     </div>
@@ -1522,7 +1638,7 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             `;
         }
 
-        // APP: RESUME (PDF DOCUMENT VIEWER)
+        /* 8. RESUME PDF VIEWER */
         function renderResume(container) {
             container.innerHTML = `
                 <div class="resume-view">
@@ -1571,98 +1687,6 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             `;
         }
 
-        // APP: CTF HUB (HTB / THM)
-        function renderCTFHub(container) {
-            container.innerHTML = `
-                <div class="ctf-container">
-                    <div style="margin-bottom:16px;">
-                        <h2 style="color:var(--neon-green); font-size:16px;">OFFENSIVE LABS & CTF SCORECARD</h2>
-                        <span style="color:var(--text-dim); font-size:11px;">Active platforms: TryHackMe & Hack The Box</span>
-                    </div>
-                    <div class="ctf-stats-grid">
-                        <div class="stat-box">
-                            <div class="stat-val">30+</div>
-                            <div class="stat-lbl">Rooms & Labs Solved</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-val">100%</div>
-                            <div class="stat-lbl">Root PrivEsc Rate</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-val">Top 15%</div>
-                            <div class="stat-lbl">THM Global Standing</div>
-                        </div>
-                    </div>
-                    <div style="background:var(--bg-elevated); padding:16px; border-radius:6px; border:1px solid var(--border-dim); margin-bottom:14px;">
-                        <h4 style="color:#fff; margin-bottom:8px;">Core Offensive Vectors Mastered:</h4>
-                        <ul style="padding-left:18px; line-height:1.7; font-size:12px; color:#d1dde8;">
-                            <li><strong>Unrestricted File Upload:</strong> Bypassing client & MIME type checks, double extensions, deploying PHP/ASPX web shells.</li>
-                            <li><strong>Reverse Shell Stabilization:</strong> Netcat listening, Python pty spawning, terminal raw mode stty adjustments.</li>
-                            <li><strong>Network Brute-Forcing:</strong> THC-Hydra for SSH/FTP/HTTP-form attacks; John the Ripper for password hash cracking.</li>
-                            <li><strong>Linux Privilege Escalation:</strong> SUID root binaries, misconfigured sudo permissions, path manipulation, vulnerable cron jobs.</li>
-                        </ul>
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        <a href="https://tryhackme.com/p/Jaydeep.Shirsath" target="_blank" class="ext-btn">TryHackMe Profile ↗</a>
-                        <a href="https://profile.hackthebox.com/profile/019e6d7d-e327-7384-82d6-298def550f7d?utm_medium=copy_url" target="_blank" class="ext-btn">Hack The Box Profile ↗</a>
-                    </div>
-                </div>
-            `;
-        }
-
-        // APP: CERTS & CREDLY
-        function renderCerts(container) {
-            container.innerHTML = `
-                <div class="cert-container">
-                    <div class="cert-card">
-                        <div class="cert-badge-icon">☁️</div>
-                        <strong style="color:#fff; font-size:14px;">Google Cloud Arcade Alum</strong>
-                        <span style="font-size:11px; color:var(--neon-amber); font-family:var(--font-mono);">Verified Issuer: Google Cloud</span>
-                        <p style="font-size:12px; color:var(--text-dim); line-height:1.5;">Demonstrated practical competence across Cloud IAM, Compute Engine security, cloud storage access, and resource isolation.</p>
-                        <a href="https://www.credly.com/users/jaydeep-shirsath" target="_blank" class="ext-btn" style="margin-top:auto;">View on Credly ↗</a>
-                    </div>
-                    <div class="cert-card">
-                        <div class="cert-badge-icon">🛡️</div>
-                        <strong style="color:#fff; font-size:14px;">TryHackMe Security Badges</strong>
-                        <span style="font-size:11px; color:var(--neon-green); font-family:var(--font-mono);">Offensive & Defensive Tracks</span>
-                        <p style="font-size:12px; color:var(--text-dim); line-height:1.5;">Completed modules in Web Fundamentals, Network Reconnaissance (Nmap), Linux PrivEsc, and Cryptography.</p>
-                        <a href="https://tryhackme.com/p/Jaydeep.Shirsath" target="_blank" class="ext-btn" style="margin-top:auto;">Audit THM Badges ↗</a>
-                    </div>
-                    <div class="cert-card">
-                        <div class="cert-badge-icon">🎓</div>
-                        <strong style="color:#fff; font-size:14px;">BCA Cybersecurity Degree Track</strong>
-                        <span style="font-size:11px; color:var(--neon-cyan); font-family:var(--font-mono);">Ajeenkya DY Patil University</span>
-                        <p style="font-size:12px; color:var(--text-dim); line-height:1.5;">Coursework in Cryptography, Digital Forensics, Reverse Engineering, C++, Python, Computer Networks, and DBMS.</p>
-                        <span style="font-size:11px; color:var(--text-dim); margin-top:auto;">Expected Graduation: 2028</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        // APP: GALLERY
-        function renderGallery(container) {
-            container.innerHTML = `
-                <div class="gal-container">
-                    <div class="gal-card" onclick="alert('Google Cloud Arcade Facilitator Swags and recognition awards received for completing security and cloud architecture tracks.')">
-                        <div class="gal-thumb">🎁 Cloud Arcade Swags</div>
-                        <div class="gal-title">GCP Arcade Rewards & Swag Kit</div>
-                    </div>
-                    <div class="gal-card" onclick="alert('TryHackMe privilege escalation and root flag capture verification.')">
-                        <div class="gal-thumb">🚩 Root Shell Proof</div>
-                        <div class="gal-title">Linux PrivEsc / SUID Exploitation</div>
-                    </div>
-                    <div class="gal-card" onclick="alert('Virtual test environment built in VMware Workstation and VirtualBox for security isolation.')">
-                        <div class="gal-thumb">🖥️ Virtualization Labs</div>
-                        <div class="gal-title">Debian / VMware Network Hardening</div>
-                    </div>
-                    <div class="gal-card" onclick="alert('Ghidra Decompiler binary analysis workspace inspecting custom control flows.')">
-                        <div class="gal-thumb">🔍 Ghidra Workspace</div>
-                        <div class="gal-title">Binary Reverse Engineering Proof</div>
-                    </div>
-                </div>
-            `;
-        }
-
         function openFileText(type) {
             openApp('terminal');
             const out = document.getElementById('termOutput');
@@ -1676,9 +1700,6 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             }
         }
 
-        /* =========================================================================
-           7. TASKBAR CLOCK, START MENU & CONTEXT MENU
-           ========================================================================= */
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toTimeString().split(' ')[0];
@@ -1692,7 +1713,6 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        // Hide menus on click outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#startMenu') && !e.target.closest('.start-btn')) {
                 document.getElementById('startMenu').style.display = 'none';
@@ -1700,7 +1720,6 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             hideContextMenu();
         });
 
-        // Desktop Context Menu
         desktop.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             playBeep(650, 0.03);
@@ -1714,7 +1733,6 @@ Systems: Linux Access Control (chmod, chown), VMware, VirtualBox, Cloud IAM.`;
             document.getElementById('contextMenu').style.display = 'none';
         }
 
-        // Launch default windows on load
         window.addEventListener('load', () => {
             openApp('terminal');
         });
